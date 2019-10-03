@@ -1,0 +1,17 @@
+spring:
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+      bindings:
+        weblog:
+          destination: weblog
+          contentType: application/json
+        workflow:
+          destination: workflow
+          contentType: application/json
+        task:
+          destination: task
+          contentType: application/json
+
