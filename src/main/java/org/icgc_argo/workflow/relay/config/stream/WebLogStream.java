@@ -9,5 +9,4 @@ public interface WebLogStream {
 
   @Output(WEBLOG)
   MessageChannel webLogOutput();
-
 }

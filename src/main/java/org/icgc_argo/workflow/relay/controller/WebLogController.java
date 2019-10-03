@@ -3,7 +3,6 @@ package org.icgc_argo.workflow.relay.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.icgc_argo.workflow.relay.config.stream.WebLogStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -37,5 +36,4 @@ public class WebLogController {
     webLogStream.webLogOutput().send(MessageBuilder.withPayload(event).build());
     return Mono.just(new ResponseEntity<>(null, HttpStatus.OK));
   }
-
 }
