@@ -18,6 +18,7 @@
         <java.version>11</java.version>
         <spring-boot-admin.version>2.1.5</spring-boot-admin.version>
         <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
+        <elasticsearch.version>7.4.0</elasticsearch.version>
     </properties>
 
     <dependencies>
@@ -36,6 +37,16 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-stream-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>${elasticsearch.version}</version>
         </dependency>
 
         <dependency>

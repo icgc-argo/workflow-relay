@@ -19,5 +19,4 @@ public interface SplitStream {
 
   @Output(TASK)
   MessageChannel taskOutput();
-
 }
