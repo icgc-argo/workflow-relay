@@ -1,5 +1,6 @@
 package org.icgc_argo.workflow.relay.config.elastic;
 
+import lombok.NonNull;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -15,7 +16,7 @@ public class ElasticsearchConfig {
   private ElasticsearchProperties properties;
 
   @Autowired
-  public ElasticsearchConfig(ElasticsearchProperties properties) {
+  public ElasticsearchConfig(@NonNull ElasticsearchProperties properties) {
     this.properties = properties;
   }
 

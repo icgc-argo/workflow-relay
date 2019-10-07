@@ -1,5 +1,6 @@
 package org.icgc_argo.workflow.relay.config.elastic;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -19,12 +20,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class ElasticsearchStartupListener implements ApplicationListener<ContextRefreshedEvent> {
 
-  private RestHighLevelClient client;
-  private ElasticsearchProperties properties;
+  private final RestHighLevelClient client;
+  private final ElasticsearchProperties properties;
 
   @Autowired
   public ElasticsearchStartupListener(
-      RestHighLevelClient client, ElasticsearchProperties properties) {
+      @NonNull RestHighLevelClient client, @NonNull ElasticsearchProperties properties) {
     this.client = client;
     this.properties = properties;
   }

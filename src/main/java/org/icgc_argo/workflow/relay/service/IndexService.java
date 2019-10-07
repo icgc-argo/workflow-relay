@@ -2,6 +2,7 @@ package org.icgc_argo.workflow.relay.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -27,15 +28,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class IndexService {
 
-  private static ObjectMapper MAPPER = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  private RestHighLevelClient esClient;
-  private String workflowIndex;
-  private String taskIndex;
+  private final RestHighLevelClient esClient;
+  private final String workflowIndex;
+  private final String taskIndex;
 
   @Autowired
   public IndexService(
-      RestHighLevelClient esClient, ElasticsearchProperties elasticsearchProperties) {
+      @NonNull RestHighLevelClient esClient,
+      @NonNull ElasticsearchProperties elasticsearchProperties) {
     this.esClient = esClient;
     this.workflowIndex = elasticsearchProperties.getWorkflowIndex();
     this.taskIndex = elasticsearchProperties.getTaskIndex();
