@@ -37,5 +37,4 @@ public class SplitterService {
       log.error("Unhandled event: {}", event.toString());
     }
   }
-
 }

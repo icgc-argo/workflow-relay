@@ -17,3 +17,15 @@ spring:
         weblogout:
           destination: weblog
           contentType: application/json
+        workflowindex:
+          destination: workflow
+          contentType: application/json
+        taskindex:
+          destination: task
+          contentType: application/json
+
+elastic:
+  host: localhost
+  port: 9200
+  workflowIndex: workflow
+  taskIndex: task
