@@ -1,0 +1,73 @@
+{
+  "metadata": {
+    "parameters": {},
+    "workflow": {
+      "start": "2019-10-04T17:14:15Z",
+      "projectDir": "/home/foobar/.nextflow/assets/nextflow-io/hello",
+      "manifest": {
+        "nextflowVersion": null,
+        "defaultBranch": "master",
+        "version": null,
+        "homePage": null,
+        "gitmodules": null,
+        "description": null,
+        "name": null,
+        "mainScript": "main.nf",
+        "author": null
+      },
+      "complete": "2019-10-04T17:14:16Z",
+      "profile": "standard",
+      "homeDir": "/home/foobar",
+      "workDir": "/home/foobar/scratch/nextflow_stuff/work",
+      "container": "nextflow/bash",
+      "commitId": "a9012339ce857d6ec7a078281813d8a93645a3e7",
+      "errorMessage": null,
+      "repository": "https://github.com/nextflow-io/hello.git",
+      "containerEngine": null,
+      "scriptFile": "/home/foobar/.nextflow/assets/nextflow-io/hello/main.nf",
+      "userName": "foobar",
+      "launchDir": "/home/foobar/scratch/nextflow_stuff",
+      "runName": "hungry_hilbert",
+      "configFiles": [
+        "/home/foobar/.nextflow/assets/nextflow-io/hello/nextflow.config"
+      ],
+      "sessionId": "c0b46fa7-d953-4d9c-bcdd-fec5bd44ba93",
+      "errorReport": null,
+      "scriptId": "537c2298d228991eb8a3f7dc1001816f",
+      "revision": "master",
+      "exitStatus": 0,
+      "commandLine": "nextflow run hello -with-weblog 'http://localhost:8080/'",
+      "nextflow": {
+        "version": "19.07.0",
+        "build": 5106,
+        "timestamp": "2019-07-27T13:22:00Z"
+      },
+      "stats": {
+        "computeTimeFmt": "(a few seconds)",
+        "cachedCount": 0,
+        "cachedDuration": 0,
+        "failedDuration": 0,
+        "succeedDuration": 186,
+        "failedCount": 0,
+        "cachedPct": 0.0,
+        "cachedCountFmt": "0",
+        "succeedCountFmt": "4",
+        "failedPct": 0.0,
+        "failedCountFmt": "0",
+        "ignoredCountFmt": "0",
+        "ignoredCount": 0,
+        "succeedPct": 100.0,
+        "succeedCount": 4,
+        "ignoredPct": 0.0
+      },
+      "resume": false,
+      "success": true,
+      "scriptName": "main.nf",
+      "duration": 952
+    }
+  },
+  "runId": "c0b46fa7-d953-4d9c-bcdd-fec5bd44ba93",
+  "event": "completed",
+  "runName": "hungry_hilbert",
+  "utcTime": "2019-10-04T17:14:16Z"
+}
