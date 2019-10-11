@@ -6,21 +6,27 @@ spring:
           brokers: localhost:9092
       bindings:
         weblog:
+          group: weblog
           destination: weblog
           contentType: application/json
         workflow:
+          group: splitter
           destination: workflow
           contentType: application/json
         task:
+          group: splitter
           destination: task
           contentType: application/json
         weblogout:
+          group: splitter
           destination: weblog
           contentType: application/json
         workflowindex:
+          group: index
           destination: workflow
           contentType: application/json
         taskindex:
+          group: index
           destination: task
           contentType: application/json
 
