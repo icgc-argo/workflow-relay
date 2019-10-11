@@ -1,5 +1,5 @@
 # workflow-relay
-Microservice for injest of workflow events, routing to appropriate Kafka topics, and indexing into elasticsearch. 
+Microservice for ingest of workflow events, routing to appropriate Kafka topics, and indexing into elasticsearch. 
 
 
 ## Build
@@ -27,7 +27,9 @@ docker run icgcargo/workflow-relay
 
 ## Test
 
-TODO
+```bash
+mvn clean test
+```
 
 ## Design
 
