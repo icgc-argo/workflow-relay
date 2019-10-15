@@ -48,6 +48,7 @@ public class IndexService {
   public void indexWorkflow(JsonNode event) {
     // TODO: Generalize event information parsing
     val id = event.path("runId").asText();
+    log.debug("Indexing workflow information for run: {}", id);
     val request =
         new UpdateRequest(workflowIndex, id)
             .upsert(MAPPER.writeValueAsBytes(event), XContentType.JSON)
@@ -76,6 +77,7 @@ public class IndexService {
   public void indexTask(JsonNode event) {
     // TODO: Generalize event information parsing
     val id = event.path("runId").asText();
+    log.debug("Indexing task information for run: {}", id);
     val request = new IndexRequest(taskIndex);
     request.source(
         MAPPER.writeValueAsBytes(event), XContentType.JSON); // TODO: Handle these exceptions

@@ -33,6 +33,8 @@ public class WebLogController {
   @SneakyThrows
   @PostMapping(consumes = "application/json")
   public Mono<ResponseEntity<Boolean>> consumeEvent(@RequestBody JsonNode event) {
+    // Use hashcode to see if identical events are being submitted
+    log.debug("Received event with hashcode: {}", event.hashCode());
     webLogStream.webLogOutput().send(MessageBuilder.withPayload(event).build());
     return Mono.just(new ResponseEntity<>(null, HttpStatus.OK));
   }

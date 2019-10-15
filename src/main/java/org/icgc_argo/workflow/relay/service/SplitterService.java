@@ -29,8 +29,10 @@ public class SplitterService {
   @StreamListener(SplitStream.WEBLOG)
   public void split(JsonNode event) {
     if (event.has("trace")) {
+      log.debug("Processing task event");
       taskOutput.send(MessageBuilder.withPayload(event).build());
     } else if (!event.path("metadata").path("workflow").isMissingNode()) {
+      log.debug("Processing workflow event");
       workflowOutput.send(MessageBuilder.withPayload(event).build());
     } else {
       // TODO Use error topic
