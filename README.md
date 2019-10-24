@@ -68,4 +68,20 @@ This profile will also ensure the required indices in Elastic search exist and c
 
 For every task event it will index it AS IS to the task index. 
 
-For every workflow event, it will UPSERT into elaticsearch, with the aim that each workflow run have exectly one document in the workflow index, and it will contain the final known state. 
+For every workflow event, it will UPSERT into elaticsearch, with the aim that each workflow run have exectly one document in the workflow index, and it will contain the final known state.
+
+####How to monitor topics using Kafka
+To monitor weblog topics:
+```
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic weblog
+```
+
+To monitor task topics: 
+```
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic task
+``` 
+
+To monitor workflow topics:
+```
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic workflow
+```
