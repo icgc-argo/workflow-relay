@@ -35,8 +35,8 @@ public class SplitterService {
       log.debug("Processing workflow event");
       workflowOutput.send(MessageBuilder.withPayload(event).build());
     } else {
-      // TODO Use error topic
       log.error("Unhandled event: {}", event.toString());
+      throw new RuntimeException("Cannot handle event, please see DLQ for event information");
     }
   }
 }
