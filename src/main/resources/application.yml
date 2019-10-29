@@ -4,6 +4,26 @@ spring:
       kafka:
         binder:
           brokers: localhost:9092
+          autoCreateTopics: true
+        bindings:
+          weblogout:
+            consumer:
+              enableDlq: true
+              dlqName: weblog_dlq
+              autoCommitOnError: true
+              autoCommitOffset: true
+          workflowindex:
+            consumer:
+              enableDlq: true
+              dlqName: workflow_dlq
+              autoCommitOnError: true
+              autoCommitOffset: true
+          taskindex:
+            consumer:
+              enableDlq: true
+              dlqName: task_dlq
+              autoCommitOnError: true
+              autoCommitOffset: true
       bindings:
         weblog:
           group: weblog
