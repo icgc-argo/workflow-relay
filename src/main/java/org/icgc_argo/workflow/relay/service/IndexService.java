@@ -44,28 +44,27 @@ public class IndexService {
   @StreamListener(IndexStream.WORKFLOW)
   public void indexWorkflow(JsonNode event) {
     // TODO: Generalize event information parsing
-      val id = event.path("runId").asText();
-      log.info("Indexing workflow information for run: {}", id);
-      val request =
-              new UpdateRequest(workflowIndex, id)
-                      .upsert(MAPPER.writeValueAsBytes(event), XContentType.JSON)
-                      .doc(
-                              MAPPER.writeValueAsBytes(event),
-                              XContentType.JSON); // TODO: Handle these exceptions
-      esClient.update(request, RequestOptions.DEFAULT);
+    val id = event.path("runId").asText();
+    log.info("Indexing workflow information for run: {}", id);
+    val request =
+        new UpdateRequest(workflowIndex, id)
+            .upsert(MAPPER.writeValueAsBytes(event), XContentType.JSON)
+            .doc(
+                MAPPER.writeValueAsBytes(event),
+                XContentType.JSON); // TODO: Handle these exceptions
+    esClient.update(request, RequestOptions.DEFAULT);
   }
 
   @SneakyThrows
   @StreamListener(IndexStream.TASK)
   public void indexTask(JsonNode event) {
     // TODO: Generalize event information parsing
-      val id = event.path("runId").asText();
-      log.info("Indexing task information for run: {}", id);
-      val request = new IndexRequest(taskIndex);
-      request.source(
-              MAPPER.writeValueAsBytes(event), XContentType.JSON); // TODO: Handle these exceptions
+    val id = event.path("runId").asText();
+    log.info("Indexing task information for run: {}", id);
+    val request = new IndexRequest(taskIndex);
+    request.source(
+        MAPPER.writeValueAsBytes(event), XContentType.JSON); // TODO: Handle these exceptions
 
-      esClient.index(request, RequestOptions.DEFAULT);
+    esClient.index(request, RequestOptions.DEFAULT);
   }
-
 }
