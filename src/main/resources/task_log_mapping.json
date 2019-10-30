@@ -1,0 +1,30 @@
+{
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "runId": {
+        "type": "keyword"
+      },
+      "trace": {
+        "type": "nested",
+        "properties": {
+          "start": {
+            "type": "date"
+          },
+          "complete": {
+            "type": "date"
+          },
+          "exit": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "keyword"
+          },
+          "script": {
+            "type": "text"
+          }
+        }
+      }
+    }
+  }
+}
