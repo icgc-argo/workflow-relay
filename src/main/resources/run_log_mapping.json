@@ -8,30 +8,20 @@
       "runName": {
         "type": "keyword"
       },
-      "metadata": {
-        "type": "nested",
-        "properties": {
-          "workflow": {
-            "type": "nested",
-            "properties": {
-              "complete": {
-                "type": "date"
-              },
-              "start": {
-                "type": "date"
-              },
-              "exitStatus": {
-                "type": "integer"
-              },
-              "commandLine":{
-                "type": "text"
-              },
-              "errorReport": {
-                "type": "text"
-              }
-            }
-          }
-        }
+      "startTime": {
+        "type": "date"
+      },
+      "completeTime": {
+        "type": "date"
+      },
+      "exitStatus": {
+        "type": "integer"
+      },
+      "commandLine":{
+        "type": "text"
+      },
+      "errorReport": {
+        "type": "text"
       }
     }
   }

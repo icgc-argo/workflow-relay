@@ -1,5 +1,6 @@
 package org.icgc_argo.workflow.relay.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
@@ -13,6 +14,9 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.icgc_argo.workflow.relay.config.elastic.ElasticsearchProperties;
 import org.icgc_argo.workflow.relay.config.stream.IndexStream;
+import org.icgc_argo.workflow.relay.entities.metadata.TaskEvent;
+import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
+import org.icgc_argo.workflow.relay.util.DocumentConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
@@ -26,7 +30,6 @@ import org.springframework.stereotype.Service;
 public class IndexService {
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
-
   private final RestHighLevelClient esClient;
   private final String workflowIndex;
   private final String taskIndex;
@@ -43,14 +46,24 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.WORKFLOW)
   public void indexWorkflow(JsonNode event) {
-    // TODO: Generalize event information parsing
+    // deserialize json events to metadata objects
+    val tempMapper =
+        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    val workflowEvent = tempMapper.treeToValue(event, WorkflowEvent.class);
+
+    // convert metadata objects to indexing objects
+    val doc = DocumentConverter.buildWorkflowDocument(workflowEvent);
+
+    // serialize indexing objects to json
+    val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
+
     val id = event.path("runId").asText();
     log.info("Indexing workflow information for run: {}", id);
     val request =
         new UpdateRequest(workflowIndex, id)
-            .upsert(MAPPER.writeValueAsBytes(event), XContentType.JSON)
+            .upsert(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON)
             .doc(
-                MAPPER.writeValueAsBytes(event),
+                MAPPER.writeValueAsBytes(jsonNode),
                 XContentType.JSON); // TODO: Handle these exceptions
     esClient.update(request, RequestOptions.DEFAULT);
   }
@@ -58,13 +71,16 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.TASK)
   public void indexTask(JsonNode event) {
-    // TODO: Generalize event information parsing
+    val tempMapper =
+        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    val taskEvent = tempMapper.treeToValue(event, TaskEvent.class);
+    val doc = DocumentConverter.buildTaskDocument(taskEvent);
+    val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
     val id = event.path("runId").asText();
     log.info("Indexing task information for run: {}", id);
     val request = new IndexRequest(taskIndex);
     request.source(
-        MAPPER.writeValueAsBytes(event), XContentType.JSON); // TODO: Handle these exceptions
-
+        MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON); // TODO: Handle these exceptions
     esClient.index(request, RequestOptions.DEFAULT);
   }
 }
