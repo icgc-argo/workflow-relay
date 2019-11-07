@@ -1,6 +1,5 @@
 package org.icgc_argo.workflow.relay.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
@@ -47,14 +46,12 @@ public class IndexService {
   @StreamListener(IndexStream.WORKFLOW)
   public void indexWorkflow(JsonNode event) {
     // deserialize json events to metadata objects
-    val tempMapper =
-        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    val workflowEvent = tempMapper.treeToValue(event, WorkflowEvent.class);
+    val workflowEvent = MAPPER.treeToValue(event, WorkflowEvent.class);
 
-    // convert metadata objects to indexing objects
+    // convert metadata objects to index objects
     val doc = DocumentConverter.buildWorkflowDocument(workflowEvent);
 
-    // serialize indexing objects to json
+    // serialize index objects to json
     val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
 
     val id = event.path("runId").asText();
@@ -71,9 +68,7 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.TASK)
   public void indexTask(JsonNode event) {
-    val tempMapper =
-        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    val taskEvent = tempMapper.treeToValue(event, TaskEvent.class);
+    val taskEvent = MAPPER.treeToValue(event, TaskEvent.class);
     val doc = DocumentConverter.buildTaskDocument(taskEvent);
     val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
     val id = event.path("runId").asText();
@@ -83,4 +78,5 @@ public class IndexService {
         MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON); // TODO: Handle these exceptions
     esClient.index(request, RequestOptions.DEFAULT);
   }
+
 }

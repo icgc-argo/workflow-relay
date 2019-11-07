@@ -1,19 +1,20 @@
 package org.icgc_argo.workflow.relay.util;
 
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.icgc_argo.workflow.relay.entities.indexing.TaskDocument;
-import org.icgc_argo.workflow.relay.entities.indexing.WorkflowDocument;
+import org.icgc_argo.workflow.relay.entities.index.TaskDocument;
+import org.icgc_argo.workflow.relay.entities.index.WorkflowDocument;
 import org.icgc_argo.workflow.relay.entities.metadata.TaskEvent;
 import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
 
-/** Utility class that converts metadata POJOs to indexing POJOs. */
+/** Utility class that converts metadata POJOs to index POJOs. */
 @Slf4j
 @NoArgsConstructor
 public class DocumentConverter {
 
-  public static WorkflowDocument buildWorkflowDocument(WorkflowEvent workflowEvent) {
+  public static WorkflowDocument buildWorkflowDocument(@NonNull WorkflowEvent workflowEvent) {
     val workflow = workflowEvent.getMetadata().getWorkflow();
     return WorkflowDocument.builder()
         .runId(workflowEvent.getRunId())
@@ -26,7 +27,7 @@ public class DocumentConverter {
         .build();
   }
 
-  public static TaskDocument buildTaskDocument(TaskEvent taskEvent) {
+  public static TaskDocument buildTaskDocument(@NonNull TaskEvent taskEvent) {
     val trace = taskEvent.getTrace();
     return TaskDocument.builder()
         .runId(taskEvent.getRunId())

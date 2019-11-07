@@ -1,4 +1,4 @@
-package org.icgc_argo.workflow.relay.entities.indexing;
+package org.icgc_argo.workflow.relay.entities.index;
 
 import java.util.Date;
 import lombok.*;
@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class TaskDocument {
+public class WorkflowDocument {
 
   /** Workflow run ID */
   @NonNull private String runId;
@@ -24,11 +24,11 @@ public class TaskDocument {
   private Date completeTime;
 
   /** Exit code of the program */
-  @NonNull private Integer exit;
-
-  /** Workflow run name */
-  @NonNull private String name;
+  private Integer exitStatus;
 
   /** The command line that was executed */
-  @NonNull private String script;
+  @NonNull private String commandLine;
+
+  /** A URL to retrieve standard error logs of the workflow run or task */
+  private String errorReport;
 }

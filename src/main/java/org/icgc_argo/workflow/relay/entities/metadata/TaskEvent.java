@@ -1,5 +1,6 @@
 package org.icgc_argo.workflow.relay.entities.metadata;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 @Getter
@@ -8,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TaskEvent {
 
   @NonNull private Trace trace;
@@ -17,4 +19,5 @@ public class TaskEvent {
 
   /** Workflow run name */
   @NonNull private String runName;
+
 }

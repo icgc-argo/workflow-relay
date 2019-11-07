@@ -1,5 +1,6 @@
 package org.icgc_argo.workflow.relay.entities.metadata;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Date;
 import lombok.*;
 
@@ -9,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Trace {
 
   /** When the command started executing */
@@ -25,4 +27,5 @@ public class Trace {
 
   /** The command line that was executed */
   @NonNull private String script;
+
 }
