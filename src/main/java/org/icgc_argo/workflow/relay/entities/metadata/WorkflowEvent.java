@@ -15,9 +15,12 @@ public class WorkflowEvent {
   /** workflow run ID */
   @NonNull private String runId;
 
-  @NonNull private Metadata metadata;
-
   /** workflow run name */
   @NonNull private String runName;
+
+  /** The overall state of the workflow run, mapped to WorkflowDocument's state */
+  @NonNull private String event;
+
+  @NonNull private Metadata metadata;
 
 }

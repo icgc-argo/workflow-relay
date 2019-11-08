@@ -8,6 +8,9 @@
       "runName": {
         "type": "keyword"
       },
+      "state": {
+        "type": "keyword"
+      },
       "startTime": {
         "type": "date"
       },

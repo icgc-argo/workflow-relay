@@ -28,6 +28,7 @@ public class TestDocumentConverter {
 
     assertEquals(workflowEvent.getRunId(), doc.getRunId());
     assertEquals(workflowEvent.getRunName(), doc.getRunName());
+    assertEquals(workflowEvent.getEvent(), doc.getState());
     assertEquals(expected.getStart(), doc.getStartTime());
     assertEquals(expected.getComplete(), doc.getCompleteTime());
     assertEquals(expected.getErrorReport(), doc.getErrorReport());
@@ -43,6 +44,7 @@ public class TestDocumentConverter {
 
     assertEquals(taskEvent.getRunId(), doc.getRunId());
     assertEquals(taskEvent.getRunName(), doc.getRunName());
+    assertEquals(expected.getStatus(), doc.getState());
     assertEquals(expected.getComplete(), doc.getCompleteTime());
     assertEquals(expected.getStart(), doc.getStartTime());
     assertEquals(expected.getScript(), doc.getScript());
