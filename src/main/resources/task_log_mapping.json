@@ -5,25 +5,23 @@
       "runId": {
         "type": "keyword"
       },
-      "trace": {
-        "type": "nested",
-        "properties": {
-          "start": {
-            "type": "date"
-          },
-          "complete": {
-            "type": "date"
-          },
-          "exit": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "keyword"
-          },
-          "script": {
-            "type": "text"
-          }
-        }
+      "runName": {
+        "type": "keyword"
+      },
+      "startTime": {
+        "type": "date"
+      },
+      "completeTime": {
+        "type": "date"
+      },
+      "exit": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "keyword"
+      },
+      "script": {
+        "type": "text"
       }
     }
   }
