@@ -78,5 +78,4 @@ public class IndexService {
         MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON); // TODO: Handle these exceptions
     esClient.index(request, RequestOptions.DEFAULT);
   }
-
 }

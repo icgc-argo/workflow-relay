@@ -19,5 +19,4 @@ public class TaskEvent {
 
   /** Workflow run name */
   @NonNull private String runName;
-
 }

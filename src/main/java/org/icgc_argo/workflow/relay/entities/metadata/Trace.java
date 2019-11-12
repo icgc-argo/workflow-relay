@@ -28,7 +28,6 @@ public class Trace {
   /** The command line that was executed */
   @NonNull private String script;
 
-  /** The overall state of the task run, mapped to TaskDocument - state */
+  /** The overall state of the task run, mapped to TaskDocument - TaskState */
   @NonNull private String status;
-
 }

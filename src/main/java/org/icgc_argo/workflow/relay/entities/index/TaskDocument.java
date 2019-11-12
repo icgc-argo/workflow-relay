@@ -18,7 +18,7 @@ public class TaskDocument {
   @NonNull private String runName;
 
   /** The overall state of the task run, mapped to Trace's "status" */
-  @NonNull private String state;
+  @NonNull private TaskState state;
 
   /** When the command started executing */
   @NonNull private Date startTime;

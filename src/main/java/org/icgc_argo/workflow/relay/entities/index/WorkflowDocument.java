@@ -18,7 +18,7 @@ public class WorkflowDocument {
   @NonNull private String runName;
 
   /** The overall state of the workflow run, mapped to WorkflowEvent - event */
-  @NonNull private String state;
+  @NonNull private WorkflowState state;
 
   /** When the command started executing */
   @NonNull private Date startTime;

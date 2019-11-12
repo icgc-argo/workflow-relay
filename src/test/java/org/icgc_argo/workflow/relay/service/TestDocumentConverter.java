@@ -6,6 +6,8 @@ import static org.junit.Assert.assertEquals;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.icgc_argo.workflow.relay.entities.index.TaskState;
+import org.icgc_argo.workflow.relay.entities.index.WorkflowState;
 import org.icgc_argo.workflow.relay.entities.metadata.TaskEvent;
 import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
 import org.icgc_argo.workflow.relay.util.DocumentConverter;
@@ -28,7 +30,7 @@ public class TestDocumentConverter {
 
     assertEquals(workflowEvent.getRunId(), doc.getRunId());
     assertEquals(workflowEvent.getRunName(), doc.getRunName());
-    assertEquals(workflowEvent.getEvent(), doc.getState());
+    assertEquals(doc.getState(), WorkflowState.COMPLETE);
     assertEquals(expected.getStart(), doc.getStartTime());
     assertEquals(expected.getComplete(), doc.getCompleteTime());
     assertEquals(expected.getErrorReport(), doc.getErrorReport());
@@ -44,7 +46,7 @@ public class TestDocumentConverter {
 
     assertEquals(taskEvent.getRunId(), doc.getRunId());
     assertEquals(taskEvent.getRunName(), doc.getRunName());
-    assertEquals(expected.getStatus(), doc.getState());
+    assertEquals(TaskState.QUEUED, doc.getState());
     assertEquals(expected.getComplete(), doc.getCompleteTime());
     assertEquals(expected.getStart(), doc.getStartTime());
     assertEquals(expected.getScript(), doc.getScript());

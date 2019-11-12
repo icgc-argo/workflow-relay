@@ -1,11 +1,14 @@
 package org.icgc_argo.workflow.relay.util;
 
+import static org.icgc_argo.workflow.relay.exceptions.NotFoundException.checkNotFound;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.icgc_argo.workflow.relay.entities.index.TaskDocument;
+import org.icgc_argo.workflow.relay.entities.index.TaskState;
 import org.icgc_argo.workflow.relay.entities.index.WorkflowDocument;
+import org.icgc_argo.workflow.relay.entities.index.WorkflowState;
 import org.icgc_argo.workflow.relay.entities.metadata.TaskEvent;
 import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
 
@@ -15,11 +18,19 @@ import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
 public class DocumentConverter {
 
   public static WorkflowDocument buildWorkflowDocument(@NonNull WorkflowEvent workflowEvent) {
+
+    checkNotFound(
+        workflowEvent.getMetadata() != null,
+        "Cannot convert workflow event to workflow document: metadata is null.");
+    checkNotFound(
+        workflowEvent.getMetadata().getWorkflow() != null,
+        "Cannot convert workflow event to workflow document: getWorkflow is null.");
+
     val workflow = workflowEvent.getMetadata().getWorkflow();
     return WorkflowDocument.builder()
         .runId(workflowEvent.getRunId())
         .runName(workflowEvent.getRunName())
-        .state(workflowEvent.getEvent())
+        .state(WorkflowState.fromValue(workflowEvent.getEvent()))
         .startTime(workflow.getStart())
         .completeTime(workflow.getComplete())
         .commandLine(workflow.getCommandLine())
@@ -29,11 +40,15 @@ public class DocumentConverter {
   }
 
   public static TaskDocument buildTaskDocument(@NonNull TaskEvent taskEvent) {
+
+    checkNotFound(
+        taskEvent.getTrace() != null, "Cannot convert task event to task document, trace is null.");
     val trace = taskEvent.getTrace();
+
     return TaskDocument.builder()
         .runId(taskEvent.getRunId())
         .runName(taskEvent.getRunName())
-        .state(trace.getStatus())
+        .state(TaskState.fromValue(trace.getStatus()))
         .name(trace.getName())
         .startTime(trace.getStart())
         .completeTime(trace.getComplete())
