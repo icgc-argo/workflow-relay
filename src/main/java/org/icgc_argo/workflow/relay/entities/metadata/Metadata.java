@@ -13,5 +13,4 @@ import lombok.*;
 public class Metadata {
 
   @NonNull private Workflow workflow;
-
 }
