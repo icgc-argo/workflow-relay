@@ -1,6 +1,7 @@
 package org.icgc_argo.workflow.relay.entities.index;
 
 import java.util.Date;
+import java.util.Map;
 import lombok.*;
 
 @Getter
@@ -20,11 +21,16 @@ public class WorkflowDocument {
   /** The overall state of the workflow run, mapped to WorkflowEvent - event */
   @NonNull private WorkflowState state;
 
+  private Map<String, Object> parameters;
+
   /** When the command started executing */
   @NonNull private Date startTime;
 
   /** When the command stopped executing (completed, failed, or cancelled) */
   private Date completeTime;
+
+  /** The repository url */
+  private String repository;
 
   /** Exit code of the program */
   private Integer exitStatus;

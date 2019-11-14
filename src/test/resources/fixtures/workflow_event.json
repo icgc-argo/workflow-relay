@@ -1,6 +1,11 @@
 {
   "metadata": {
-    "parameters": {},
+    "parameters": {
+      "input": {
+        "class": "File",
+        "path": "ftp://ftp-private.ebi.ac.uk/upload/foivos/test.txt"
+      }
+    },
     "workflow": {
       "start": "2019-10-04T17:14:15Z",
       "projectDir": "/home/foobar/.nextflow/assets/nextflow-io/hello",

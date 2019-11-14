@@ -13,6 +13,7 @@ import org.icgc_argo.workflow.relay.entities.metadata.TaskEvent;
 import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
 
 /** Utility class that converts metadata POJOs to index POJOs. */
+
 @Slf4j
 @NoArgsConstructor
 public class DocumentConverter {
@@ -24,15 +25,17 @@ public class DocumentConverter {
         "Cannot convert workflow event to workflow document: metadata is null.");
     checkNotFound(
         workflowEvent.getMetadata().getWorkflow() != null,
-        "Cannot convert workflow event to workflow document: getWorkflow is null.");
+        "Cannot convert workflow event to workflow document: workflow is null.");
 
     val workflow = workflowEvent.getMetadata().getWorkflow();
     return WorkflowDocument.builder()
         .runId(workflowEvent.getRunId())
         .runName(workflowEvent.getRunName())
         .state(WorkflowState.fromValue(workflowEvent.getEvent()))
+        .parameters(workflowEvent.getMetadata().getParameters())
         .startTime(workflow.getStart())
         .completeTime(workflow.getComplete())
+        .repository(workflow.getRepository())
         .commandLine(workflow.getCommandLine())
         .errorReport(workflow.getErrorReport())
         .exitStatus(workflow.getExitStatus())
