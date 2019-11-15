@@ -1,6 +1,6 @@
 {
   "mappings": {
-    "dynamic": false,
+    "dynamic": true,
     "properties": {
       "runId": {
         "type": "keyword"
@@ -16,6 +16,9 @@
       },
       "completeTime": {
         "type": "date"
+      },
+      "repository": {
+        "type": "text"
       },
       "exitStatus": {
         "type": "integer"

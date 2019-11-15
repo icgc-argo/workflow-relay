@@ -31,8 +31,10 @@ public class TestDocumentConverter {
     assertEquals(workflowEvent.getRunId(), doc.getRunId());
     assertEquals(workflowEvent.getRunName(), doc.getRunName());
     assertEquals(doc.getState(), WorkflowState.COMPLETE);
+    assertEquals(workflowEvent.getMetadata().getParameters(), doc.getParameters());
     assertEquals(expected.getStart(), doc.getStartTime());
     assertEquals(expected.getComplete(), doc.getCompleteTime());
+    assertEquals(expected.getRepository(), doc.getRepository());
     assertEquals(expected.getErrorReport(), doc.getErrorReport());
     assertEquals(expected.getExitStatus(), doc.getExitStatus());
     assertEquals(expected.getCommandLine(), doc.getCommandLine());

@@ -19,6 +19,9 @@ public class Workflow {
   /** When the command stopped executing (completed, failed, or cancelled) */
   @NonNull private Date complete;
 
+  /** The repository url */
+  private String repository;
+
   /** Exit code of the program */
   private Integer exitStatus;
 

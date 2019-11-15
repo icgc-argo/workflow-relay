@@ -1,6 +1,7 @@
 package org.icgc_argo.workflow.relay.entities.metadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.Map;
 import lombok.*;
 
 @Getter
@@ -11,6 +12,9 @@ import lombok.*;
 @EqualsAndHashCode
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Metadata {
+
+  /** The workflow run parameters including input and output file locations * */
+  @NonNull private Map<String, Object> parameters;
 
   @NonNull private Workflow workflow;
 }
