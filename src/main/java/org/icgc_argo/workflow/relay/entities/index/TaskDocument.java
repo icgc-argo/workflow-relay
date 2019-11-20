@@ -1,5 +1,6 @@
 package org.icgc_argo.workflow.relay.entities.index;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Date;
 import lombok.*;
 
@@ -9,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskDocument {
 
   /** Workflow run ID */
