@@ -1,6 +1,7 @@
 package org.icgc_argo.workflow.relay.util;
 
 import static org.icgc_argo.workflow.relay.exceptions.NotFoundException.checkNotFound;
+
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import org.icgc_argo.workflow.relay.entities.metadata.TaskEvent;
 import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
 
 /** Utility class that converts metadata POJOs to index POJOs. */
-
 @Slf4j
 @NoArgsConstructor
 public class DocumentConverter {
