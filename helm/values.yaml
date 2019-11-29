@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: buwujiu/workflow-relay
+  repository: icgcargo/workflow-relay
   tag: latest
   pullPolicy: IfNotPresent
 
