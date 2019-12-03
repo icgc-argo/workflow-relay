@@ -45,39 +45,61 @@ spec:
         }
     }
     stages {
-        stage('Prepare') {
-            steps {
-                script {
-                    commit = sh(returnStdout: true, script: 'git describe --always').trim()
-                }
-                script {
-                    version = readMavenPom().getVersion()
-                }
-            }
-        }
-        stage('Test') {
-            steps {
-                container('jdk') {
-                    sh "./mvnw test"
-                }
-            }
-        }
-        stage('Build') {
-            steps {
-                container('docker') {
-                    withCredentials([usernamePassword(credentialsId:'argoDockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh 'docker login -u $USERNAME -p $PASSWORD'
+                stage('Prepare') {
+                    steps {
+                        script {
+                            commit = sh(returnStdout: true, script: 'git describe --always').trim()
+                            version = readMavenPom().getVersion()
+                        }
                     }
-                    script {
-                        commit = sh(returnStdout: true, script: 'git describe --always').trim()
+                }
+                stage('Test') {
+                    steps {
+                        container('jdk') {
+                            sh "./mvnw test"
+                        }
                     }
+                }
+                stage('Build & Publish Develop') {
+                    when {
+                        branch "develop"
+                    }
+                    steps {
+                        container('docker') {
+                            withCredentials([usernamePassword(credentialsId:'argoDockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                                sh 'docker login -u $USERNAME -p $PASSWORD'
+                            }
 
-                    // DNS error if --network is default
-                    sh "docker build --network=host . -t icgcargo/workflow-relay:${commit}"
+                            // DNS error if --network is default
+                            sh "docker build --network=host . -t icgcargo/workflow-relay:edge -t icgcargo/workflow-relay:${version}-${commit}"
 
-                    sh "docker push icgcargo/workflow-relay:${commit}"
+                            sh "docker push icgcargo/workflow-relay:${version}-${commit}"
+                            sh "docker push icgcargo/workflow-relay:edge"
+                        }
+                    }
+                }
+                stage('Release & Tag') {
+                    when {
+                        branch "master"
+                    }
+                    steps {
+                        container('docker') {
+                            withCredentials([usernamePassword(credentialsId: 'argoGithub', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh "git tag ${version}"
+                              sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/icgc-argo/workflow-relay --tags"
+                            }
+
+                            withCredentials([usernamePassword(credentialsId:'argoDockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                                sh 'docker login -u $USERNAME -p $PASSWORD'
+                            }
+
+                            // DNS error if --network is default
+                            sh "docker build --network=host . -t icgcargo/workflow-relay:latest -t icgcargo/workflow-relay:${version}"
+
+                            sh "docker push icgcargo/workflow-relay:${version}"
+                            sh "docker push icgcargo/workflow-relay:latest"
+                        }
+                    }
                 }
             }
-        }
-    }
 }

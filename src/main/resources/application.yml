@@ -1,4 +1,9 @@
+server:
+  port: 8083
+
 spring:
+  application:
+    name: Workflow Relay
   cloud:
     stream:
       kafka:
