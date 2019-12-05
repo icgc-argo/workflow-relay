@@ -1,7 +1,7 @@
 package org.icgc_argo.workflow.relay.entities.metadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.Date;
+import java.time.OffsetDateTime;
 import lombok.*;
 
 @Getter
@@ -14,10 +14,10 @@ import lombok.*;
 public class Workflow {
 
   /** When the command started executing */
-  @NonNull private Date start;
+  @NonNull private OffsetDateTime start;
 
   /** When the command stopped executing (completed, failed, or cancelled) */
-  @NonNull private Date complete;
+  private OffsetDateTime complete;
 
   /** The repository url */
   private String repository;

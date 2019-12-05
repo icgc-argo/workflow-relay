@@ -1,5 +1,6 @@
 package org.icgc_argo.workflow.relay.util;
 
+import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
 import static org.icgc_argo.workflow.relay.util.StringUtilities.inputStreamToString;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -20,6 +21,8 @@ public class Fixture {
       Class clazz, String fileName, Class<T> targetClass, ObjectMapper customMapper) {
     String json = loadJsonString(clazz, fileName);
     customMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    customMapper.registerModule(getOffsetDateTimeModule());
+
     return customMapper.readValue(json, targetClass);
   }
 
