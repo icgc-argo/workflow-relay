@@ -2,8 +2,6 @@ package org.icgc_argo.workflow.relay.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import java.time.OffsetDateTime;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -49,9 +47,7 @@ public class IndexService {
   @StreamListener(IndexStream.WORKFLOW)
   public void indexWorkflow(JsonNode event) {
     // deserialize json events to metadata objects
-    val module = new SimpleModule();
-    module.addDeserializer(OffsetDateTime.class, new OffsetDateTimeDeserializer());
-    MAPPER.registerModule(module);
+    MAPPER.registerModule(OffsetDateTimeDeserializer.getModule());
 
     val workflowEvent = MAPPER.treeToValue(event, WorkflowEvent.class);
 

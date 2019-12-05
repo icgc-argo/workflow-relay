@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -37,5 +38,10 @@ public class OffsetDateTimeDeserializer extends StdDeserializer<OffsetDateTime> 
         node.get("second").asInt(),
         node.get("nano").asInt(),
         zoneOffSet);
+  }
+
+  public static SimpleModule getModule() {
+    val module = new SimpleModule();
+    return module.addDeserializer(OffsetDateTime.class, new OffsetDateTimeDeserializer());
   }
 }
