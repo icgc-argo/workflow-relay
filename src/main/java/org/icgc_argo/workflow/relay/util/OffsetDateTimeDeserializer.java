@@ -40,7 +40,7 @@ public class OffsetDateTimeDeserializer extends StdDeserializer<OffsetDateTime> 
         zoneOffSet);
   }
 
-  public static SimpleModule getModule() {
+  public static SimpleModule getOffsetDateTimeModule() {
     val module = new SimpleModule();
     return module.addDeserializer(OffsetDateTime.class, new OffsetDateTimeDeserializer());
   }
