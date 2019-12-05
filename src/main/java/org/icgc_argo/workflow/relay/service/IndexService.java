@@ -2,6 +2,8 @@ package org.icgc_argo.workflow.relay.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.time.OffsetDateTime;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.icgc_argo.workflow.relay.config.stream.IndexStream;
 import org.icgc_argo.workflow.relay.entities.metadata.TaskEvent;
 import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
 import org.icgc_argo.workflow.relay.util.DocumentConverter;
+import org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
@@ -46,6 +49,10 @@ public class IndexService {
   @StreamListener(IndexStream.WORKFLOW)
   public void indexWorkflow(JsonNode event) {
     // deserialize json events to metadata objects
+    val module = new SimpleModule();
+    module.addDeserializer(OffsetDateTime.class, new OffsetDateTimeDeserializer());
+    MAPPER.registerModule(module);
+
     val workflowEvent = MAPPER.treeToValue(event, WorkflowEvent.class);
 
     // convert metadata objects to index objects

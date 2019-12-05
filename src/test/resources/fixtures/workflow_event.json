@@ -7,7 +7,27 @@
       }
     },
     "workflow": {
-      "start": "2019-10-04T17:14:15Z",
+      "start": {
+        "month": "DECEMBER",
+        "offset": {
+          "rules": {
+            "transitions": [],
+            "fixedOffset": true,
+            "transitionRules": []
+          },
+          "totalSeconds": -18000,
+          "id": "-05:00"
+        },
+        "second": 6,
+        "hour": 10,
+        "nano": 888477000,
+        "year": 2019,
+        "dayOfMonth": 5,
+        "minute": 38,
+        "monthValue": 12,
+        "dayOfWeek": "THURSDAY",
+        "dayOfYear": 339
+      },
       "projectDir": "/home/foobar/.nextflow/assets/nextflow-io/hello",
       "manifest": {
         "nextflowVersion": null,
@@ -20,7 +40,27 @@
         "mainScript": "main.nf",
         "author": null
       },
-      "complete": "2019-10-04T17:14:16Z",
+      "complete": {
+        "month": "DECEMBER",
+        "offset": {
+          "rules": {
+            "transitions": [],
+            "fixedOffset": true,
+            "transitionRules": []
+          },
+          "totalSeconds": -18000,
+          "id": "-05:00"
+        },
+        "second": 24,
+        "hour": 10,
+        "nano": 156088000,
+        "year": 2019,
+        "dayOfMonth": 5,
+        "minute": 41,
+        "monthValue": 12,
+        "dayOfWeek": "THURSDAY",
+        "dayOfYear": 339
+      },
       "profile": "standard",
       "homeDir": "/home/foobar",
       "workDir": "/home/foobar/scratch/nextflow_stuff/work",

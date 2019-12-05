@@ -25,6 +25,7 @@ public class TestDocumentConverter {
   public void testConvertWorkflowJson() {
     val workflowEvent =
         loadJsonFixture(this.getClass(), "workflow_event.json", WorkflowEvent.class, MAPPER);
+
     val expected = workflowEvent.getMetadata().getWorkflow();
     val doc = DocumentConverter.buildWorkflowDocument(workflowEvent);
 
@@ -32,8 +33,12 @@ public class TestDocumentConverter {
     assertEquals(workflowEvent.getRunName(), doc.getRunName());
     assertEquals(doc.getState(), WorkflowState.COMPLETE);
     assertEquals(workflowEvent.getMetadata().getParameters(), doc.getParameters());
-    assertEquals(expected.getStart(), doc.getStartTime());
-    assertEquals(expected.getComplete(), doc.getCompleteTime());
+    assertEquals(
+        expected.getStart().toInstant().toEpochMilli(),
+        doc.getStartTime().toInstant().toEpochMilli());
+    assertEquals(
+        expected.getComplete().toInstant().toEpochMilli(),
+        doc.getCompleteTime().toInstant().toEpochMilli());
     assertEquals(expected.getRepository(), doc.getRepository());
     assertEquals(expected.getErrorReport(), doc.getErrorReport());
     assertEquals(expected.getExitStatus(), doc.getExitStatus());

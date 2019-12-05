@@ -2,6 +2,8 @@ package org.icgc_argo.workflow.relay.util;
 
 import static org.icgc_argo.workflow.relay.exceptions.NotFoundException.checkNotFound;
 
+import java.util.Date;
+import java.util.Objects;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -28,18 +30,24 @@ public class DocumentConverter {
         "Cannot convert workflow event to workflow document: workflow is null.");
 
     val workflow = workflowEvent.getMetadata().getWorkflow();
-    return WorkflowDocument.builder()
-        .runId(workflowEvent.getRunId())
-        .runName(workflowEvent.getRunName())
-        .state(WorkflowState.fromValue(workflowEvent.getEvent()))
-        .parameters(workflowEvent.getMetadata().getParameters())
-        .startTime(workflow.getStart())
-        .completeTime(workflow.getComplete())
-        .repository(workflow.getRepository())
-        .commandLine(workflow.getCommandLine())
-        .errorReport(workflow.getErrorReport())
-        .exitStatus(workflow.getExitStatus())
-        .build();
+    val doc =
+        WorkflowDocument.builder()
+            .runId(workflowEvent.getRunId())
+            .runName(workflowEvent.getRunName())
+            .state(WorkflowState.fromValue(workflowEvent.getEvent()))
+            .parameters(workflowEvent.getMetadata().getParameters())
+            .startTime(new Date(workflow.getStart().toInstant().toEpochMilli()))
+            .repository(workflow.getRepository())
+            .commandLine(workflow.getCommandLine())
+            .errorReport(workflow.getErrorReport())
+            .exitStatus(workflow.getExitStatus());
+
+    val completeTime = workflow.getComplete();
+    if (Objects.nonNull(completeTime)) {
+      doc.completeTime(new Date(completeTime.toInstant().toEpochMilli()));
+    }
+
+    return doc.build();
   }
 
   public static TaskDocument buildTaskDocument(@NonNull TaskEvent taskEvent) {

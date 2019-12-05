@@ -4,11 +4,14 @@ import static org.icgc_argo.workflow.relay.util.StringUtilities.inputStreamToStr
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.File;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
+import lombok.val;
 
 @UtilityClass
 public class Fixture {
@@ -20,6 +23,11 @@ public class Fixture {
       Class clazz, String fileName, Class<T> targetClass, ObjectMapper customMapper) {
     String json = loadJsonString(clazz, fileName);
     customMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+    val module = new SimpleModule();
+    module.addDeserializer(OffsetDateTime.class, new OffsetDateTimeDeserializer());
+    customMapper.registerModule(module);
+
     return customMapper.readValue(json, targetClass);
   }
 
