@@ -38,9 +38,13 @@ public class DocumentConverter {
             .parameters(workflowEvent.getMetadata().getParameters())
             .startTime(new Date(workflow.getStart().toInstant().toEpochMilli()))
             .repository(workflow.getRepository())
+            .revision(workflow.getRevision())
             .commandLine(workflow.getCommandLine())
             .errorReport(workflow.getErrorReport())
-            .exitStatus(workflow.getExitStatus());
+            .exitStatus(workflow.getExitStatus())
+            .resume(workflow.getResume())
+            .success(workflow.getSuccess())
+            .duration(workflow.getDuration());
 
     val completeTime = workflow.getComplete();
     if (Objects.nonNull(completeTime)) {
