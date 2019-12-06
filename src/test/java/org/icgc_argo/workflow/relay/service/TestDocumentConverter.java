@@ -48,16 +48,27 @@ public class TestDocumentConverter {
   @Test
   public void testLoadTaskJson() {
     val taskEvent = loadJsonFixture(this.getClass(), "task_event.json", TaskEvent.class, MAPPER);
-    val expected = taskEvent.getTrace();
+    val trace = taskEvent.getTrace();
     val doc = DocumentConverter.buildTaskDocument(taskEvent);
 
     assertEquals(taskEvent.getRunId(), doc.getRunId());
     assertEquals(taskEvent.getRunName(), doc.getRunName());
+    assertEquals(trace.getTask_id(), doc.getTaskId());
+    assertEquals(trace.getName(), doc.getName());
+    assertEquals(trace.getProcess(), doc.getProcess());
+    assertEquals(trace.getTag(), doc.getTag());
+    assertEquals(trace.getContainer(), doc.getContainer());
+    assertEquals(trace.getAttempt(), doc.getAttempt());
     assertEquals(TaskState.QUEUED, doc.getState());
-    assertEquals(expected.getComplete(), doc.getCompleteTime());
-    assertEquals(expected.getStart(), doc.getStartTime());
-    assertEquals(expected.getScript(), doc.getScript());
-    assertEquals(expected.getExit(), doc.getExit());
-    assertEquals(expected.getName(), doc.getName());
+    assertEquals(trace.getSubmit(), doc.getSubmitTime());
+    assertEquals(trace.getStart(), doc.getStartTime());
+    assertEquals(trace.getComplete(), doc.getCompleteTime());
+    assertEquals(trace.getExit(), doc.getExit());
+    assertEquals(trace.getScript(), doc.getScript());
+    assertEquals(trace.getWorkdir(), doc.getWorkdir());
+    assertEquals(trace.getCpus(), doc.getCpus());
+    assertEquals(trace.getMemory(), doc.getMemory());
+    assertEquals(trace.getDuration(), doc.getDuration());
+    assertEquals(trace.getRealtime(), doc.getRealtime());
   }
 }
