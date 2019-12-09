@@ -1,7 +1,6 @@
 package org.icgc_argo.workflow.relay.entities.metadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.time.Instant;
 import lombok.*;
 

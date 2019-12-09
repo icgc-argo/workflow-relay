@@ -23,12 +23,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 public class TestDocumentConverter {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper()
-      .registerModule(new JavaTimeModule())
-      .registerModule(getOffsetDateTimeModule())
-      .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
-      .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
-      .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
+  private static final ObjectMapper MAPPER =
+      new ObjectMapper()
+          .registerModule(new JavaTimeModule())
+          .registerModule(getOffsetDateTimeModule())
+          .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+          .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
+          .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
 
   @Test
   public void testConvertWorkflowJson() {
@@ -42,12 +43,8 @@ public class TestDocumentConverter {
     assertEquals(workflowEvent.getRunName(), doc.getRunName());
     assertEquals(doc.getState(), WorkflowState.COMPLETE);
     assertEquals(workflowEvent.getMetadata().getParameters(), doc.getParameters());
-    assertEquals(
-        expected.getStart().toInstant(),
-        doc.getStartTime());
-    assertEquals(
-        expected.getComplete().toInstant(),
-        doc.getCompleteTime());
+    assertEquals(expected.getStart().toInstant(), doc.getStartTime());
+    assertEquals(expected.getComplete().toInstant(), doc.getCompleteTime());
     assertEquals(expected.getRepository(), doc.getRepository());
     assertEquals(expected.getErrorReport(), doc.getErrorReport());
     assertEquals(expected.getExitStatus(), doc.getExitStatus());

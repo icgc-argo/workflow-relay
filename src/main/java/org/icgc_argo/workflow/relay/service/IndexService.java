@@ -33,12 +33,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class IndexService {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper()
-      .registerModule(new JavaTimeModule())
-      .registerModule(getOffsetDateTimeModule())
-      .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
-      .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
-      .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
+  private static final ObjectMapper MAPPER =
+      new ObjectMapper()
+          .registerModule(new JavaTimeModule())
+          .registerModule(getOffsetDateTimeModule())
+          .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+          .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
+          .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
 
   private final RestHighLevelClient esClient;
   private final String workflowIndex;
