@@ -31,7 +31,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class IndexService {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new ObjectMapper()
+      .registerModule(new JavaTimeModule())
+      .registerModule(getOffsetDateTimeModule());
+
   private final RestHighLevelClient esClient;
   private final String workflowIndex;
   private final String taskIndex;
@@ -48,10 +51,6 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.WORKFLOW)
   public void indexWorkflow(JsonNode event) {
-    // deserialize json events to metadata objects
-    MAPPER.registerModule(new JavaTimeModule());
-    MAPPER.registerModule(getOffsetDateTimeModule());
-
     val workflowEvent = MAPPER.treeToValue(event, WorkflowEvent.class);
 
     // convert metadata objects to index objects

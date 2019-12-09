@@ -1,9 +1,11 @@
 package org.icgc_argo.workflow.relay.service;
 
 import static org.icgc_argo.workflow.relay.util.Fixture.loadJsonFixture;
+import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
 import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.icgc_argo.workflow.relay.entities.index.TaskState;
@@ -19,7 +21,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 public class TestDocumentConverter {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new ObjectMapper()
+      .registerModule(new JavaTimeModule())
+      .registerModule(getOffsetDateTimeModule());
 
   @Test
   public void testConvertWorkflowJson() {
