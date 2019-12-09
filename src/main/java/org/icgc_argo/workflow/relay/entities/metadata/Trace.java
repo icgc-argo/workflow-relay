@@ -1,7 +1,8 @@
 package org.icgc_argo.workflow.relay.entities.metadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.Date;
+
+import java.time.Instant;
 import lombok.*;
 
 @Getter
@@ -26,13 +27,13 @@ public class Trace {
   @NonNull private Integer exit;
 
   /** When the command was submitted */
-  @NonNull private Date submit;
+  @NonNull private Instant submit;
 
   /** When the command started executing */
-  @NonNull private Date start;
+  @NonNull private Instant start;
 
   /** When the command stopped executing (completed, failed, or cancelled) */
-  @NonNull private Date complete;
+  @NonNull private Instant complete;
 
   /** The process name */
   @NonNull private String process;

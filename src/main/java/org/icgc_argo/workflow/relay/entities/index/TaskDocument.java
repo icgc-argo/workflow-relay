@@ -1,8 +1,9 @@
 package org.icgc_argo.workflow.relay.entities.index;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.Date;
 import lombok.*;
+
+import java.time.Instant;
 
 @Getter
 @Builder
@@ -41,13 +42,13 @@ public class TaskDocument {
   @NonNull private TaskState state;
 
   /** When the command was submitted */
-  @NonNull private Date submitTime;
+  @NonNull private Instant submitTime;
 
   /** When the command started executing */
-  @NonNull private Date startTime;
+  @NonNull private Instant startTime;
 
   /** When the command stopped executing (completed, failed, or cancelled) */
-  private Date completeTime;
+  private Instant completeTime;
 
   /** Exit code of the program */
   @NonNull private Integer exit;
