@@ -4,7 +4,9 @@ import static org.icgc_argo.workflow.relay.util.Fixture.loadJsonFixture;
 import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
 import static org.junit.Assert.assertEquals;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -23,7 +25,10 @@ public class TestDocumentConverter {
 
   private static final ObjectMapper MAPPER = new ObjectMapper()
       .registerModule(new JavaTimeModule())
-      .registerModule(getOffsetDateTimeModule());
+      .registerModule(getOffsetDateTimeModule())
+      .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+      .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
+      .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
 
   @Test
   public void testConvertWorkflowJson() {

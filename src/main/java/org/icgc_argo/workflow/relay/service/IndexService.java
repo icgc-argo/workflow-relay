@@ -2,8 +2,10 @@ package org.icgc_argo.workflow.relay.service;
 
 import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -33,7 +35,10 @@ public class IndexService {
 
   private static final ObjectMapper MAPPER = new ObjectMapper()
       .registerModule(new JavaTimeModule())
-      .registerModule(getOffsetDateTimeModule());
+      .registerModule(getOffsetDateTimeModule())
+      .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
+      .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
+      .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
 
   private final RestHighLevelClient esClient;
   private final String workflowIndex;
