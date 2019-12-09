@@ -1,6 +1,6 @@
 package org.icgc_argo.workflow.relay.entities.index;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Map;
 import lombok.*;
 
@@ -24,10 +24,10 @@ public class WorkflowDocument {
   private Map<String, Object> parameters;
 
   /** When the command started executing */
-  @NonNull private Date startTime;
+  @NonNull private Instant startTime;
 
   /** When the command stopped executing (completed, failed, or cancelled) */
-  private Date completeTime;
+  private Instant completeTime;
 
   /** The repository url */
   private String repository;

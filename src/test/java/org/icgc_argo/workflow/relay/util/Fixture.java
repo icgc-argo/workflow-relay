@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
@@ -18,12 +20,13 @@ public class Fixture {
 
   @SneakyThrows
   public static <T> T loadJsonFixture(
-      Class clazz, String fileName, Class<T> targetClass, ObjectMapper customMapper) {
+      Class clazz, String fileName, Class<T> targetClass, ObjectMapper mapper) {
     String json = loadJsonString(clazz, fileName);
-    customMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    customMapper.registerModule(getOffsetDateTimeModule());
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.registerModule(new JavaTimeModule());
+    mapper.registerModule(getOffsetDateTimeModule());
 
-    return customMapper.readValue(json, targetClass);
+    return mapper.readValue(json, targetClass);
   }
 
   public static String loadJsonString(Class clazz, String fileName) throws IOException {
