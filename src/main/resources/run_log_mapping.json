@@ -12,10 +12,10 @@
         "type": "keyword"
       },
       "startTime": {
-        "type": "date"
+        "type": "date_nanos"
       },
       "completeTime": {
-        "type": "date"
+        "type": "date_nanos"
       },
       "repository": {
         "type": "text"

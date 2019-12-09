@@ -30,13 +30,13 @@
         "type": "keyword"
       },
       "submitTime": {
-        "type": "date"
+        "type": "date_nanos"
       },
       "startTime": {
-        "type": "date"
+        "type": "date_nanos"
       },
       "completeTime": {
-        "type": "date"
+        "type": "date_nanos"
       },
       "exit": {
         "type": "integer"
