@@ -38,9 +38,13 @@ public class DocumentConverter {
             .parameters(workflowEvent.getMetadata().getParameters())
             .startTime(new Date(workflow.getStart().toInstant().toEpochMilli()))
             .repository(workflow.getRepository())
+            .revision(workflow.getRevision())
             .commandLine(workflow.getCommandLine())
             .errorReport(workflow.getErrorReport())
-            .exitStatus(workflow.getExitStatus());
+            .exitStatus(workflow.getExitStatus())
+            .resume(workflow.getResume())
+            .success(workflow.getSuccess())
+            .duration(workflow.getDuration());
 
     val completeTime = workflow.getComplete();
     if (Objects.nonNull(completeTime)) {
@@ -59,12 +63,23 @@ public class DocumentConverter {
     return TaskDocument.builder()
         .runId(taskEvent.getRunId())
         .runName(taskEvent.getRunName())
-        .state(TaskState.fromValue(trace.getStatus()))
+        .taskId(trace.getTask_id())
         .name(trace.getName())
+        .process(trace.getProcess())
+        .tag(trace.getTag())
+        .container(trace.getContainer())
+        .attempt(trace.getAttempt())
+        .state(TaskState.fromValue(trace.getStatus()))
+        .submitTime(trace.getSubmit())
         .startTime(trace.getStart())
         .completeTime(trace.getComplete())
-        .script(trace.getScript())
         .exit(trace.getExit())
+        .script(trace.getScript())
+        .workdir(trace.getWorkdir())
+        .cpus(trace.getCpus())
+        .memory(trace.getMemory())
+        .duration(trace.getDuration())
+        .realtime(trace.getRealtime())
         .build();
   }
 }
