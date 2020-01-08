@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.icgc_argo</groupId>
     <artifactId>workflow-relay</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>workflow-relay</name>
     <description>Demo project for Spring Boot</description>
 
