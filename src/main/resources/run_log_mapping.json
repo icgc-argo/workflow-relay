@@ -1,0 +1,46 @@
+{
+  "mappings": {
+    "dynamic": true,
+    "properties": {
+      "runId": {
+        "type": "keyword"
+      },
+      "runName": {
+        "type": "keyword"
+      },
+      "state": {
+        "type": "keyword"
+      },
+      "startTime": {
+        "type": "date_nanos"
+      },
+      "completeTime": {
+        "type": "date_nanos"
+      },
+      "repository": {
+        "type": "text"
+      },
+      "revision": {
+        "type": "text"
+      },
+      "exitStatus": {
+        "type": "integer"
+      },
+      "commandLine":{
+        "type": "text"
+      },
+      "errorReport": {
+        "type": "text"
+      },
+      "resume": {
+        "type": "boolean"
+      },
+      "success": {
+        "type": "boolean"
+      },
+      "duration": {
+        "type": "integer"
+      }
+    }
+  }
+}

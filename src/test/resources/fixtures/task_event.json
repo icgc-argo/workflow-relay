@@ -1,0 +1,31 @@
+{
+    "trace": {
+      "task_id": 4,
+      "status": "SUBMITTED",
+      "hash": "f3/cf0732",
+      "name": "sayHello (4)",
+      "exit": 2147483647,
+      "submit": 1570470384280,
+      "start": 1571421145556,
+      "process": "sayHello",
+      "tag": null,
+      "module": [],
+      "container": "nextflow/bash",
+      "attempt": 1,
+      "script": "\n    echo 'Hola world!'\n    ",
+      "scratch": null,
+      "workdir": "/home/foobar/scratch/nextflow_stuff/work/f3/cf0732d2f0f98636ce5eb4afae5c16",
+      "queue": null,
+      "cpus": 1,
+      "memory": null,
+      "complete": 1571421145561,
+      "disk": null,
+      "time": null,
+      "env": null,
+      "native_id": null
+    },
+    "runId": "a46afc37-6d46-4bec-885d-01b13dabc8c1",
+    "event": "process_submitted",
+    "runName": "kickass_torricelli",
+    "utcTime": "2019-10-07T17:46:24Z"
+}

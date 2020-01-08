@@ -1,0 +1,64 @@
+{
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "runId": {
+        "type": "keyword"
+      },
+      "runName": {
+        "type": "keyword"
+      },
+      "taskId": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "keyword"
+      },
+      "process": {
+        "type": "keyword"
+      },
+      "tag": {
+        "type": "keyword"
+      },
+      "container": {
+        "type": "keyword"
+      },
+      "attempt": {
+        "type": "integer"
+      },
+      "state": {
+        "type": "keyword"
+      },
+      "submitTime": {
+        "type": "date_nanos"
+      },
+      "startTime": {
+        "type": "date_nanos"
+      },
+      "completeTime": {
+        "type": "date_nanos"
+      },
+      "exit": {
+        "type": "integer"
+      },
+      "script": {
+        "type": "text"
+      },
+      "workdir": {
+        "type": "keyword"
+      },
+      "cpus": {
+        "type": "integer"
+      },
+      "memory": {
+        "type": "integer"
+      },
+      "duration": {
+        "type": "integer"
+      },
+      "realtime": {
+        "type": "integer"
+      }
+    }
+  }
+}

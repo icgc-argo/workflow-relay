@@ -1,0 +1,66 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: Workflow Relay
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+          autoCreateTopics: true
+        bindings:
+          weblogout:
+            consumer:
+              enableDlq: true
+              dlqName: weblog_dlq
+              autoCommitOnError: true
+              autoCommitOffset: true
+          workflowindex:
+            consumer:
+              enableDlq: true
+              dlqName: workflow_dlq
+              autoCommitOnError: true
+              autoCommitOffset: true
+          taskindex:
+            consumer:
+              enableDlq: true
+              dlqName: task_dlq
+              autoCommitOnError: true
+              autoCommitOffset: true
+      bindings:
+        weblog:
+          group: weblog
+          destination: weblog
+          contentType: application/json
+        workflow:
+          group: splitter
+          destination: workflow
+          contentType: application/json
+        task:
+          group: splitter
+          destination: task
+          contentType: application/json
+        weblogout:
+          group: splitter
+          destination: weblog
+          contentType: application/json
+        workflowindex:
+          group: index
+          destination: workflow
+          consumer:
+            maxAttempts: 4
+          contentType: application/json
+        taskindex:
+          group: index
+          destination: task
+          consumer:
+            maxAttempts: 4
+          contentType: application/json
+
+elastic:
+  host: localhost
+  port: 9200
+  workflowIndex: workflow
+  taskIndex: task
