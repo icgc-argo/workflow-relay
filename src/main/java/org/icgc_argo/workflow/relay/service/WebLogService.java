@@ -1,11 +1,8 @@
 package org.icgc_argo.workflow.relay.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.ValueNode;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.icgc_argo.workflow.relay.config.stream.WebLogStream;
 import org.icgc_argo.workflow.relay.config.weblog.SanitizeProperties;
 import org.icgc_argo.workflow.relay.util.Sanitize;
@@ -31,9 +28,9 @@ public class WebLogService {
 
   public void handleEvent(@NonNull JsonNode event) {
     log.info("handling event: {}", event);
-    sanitizeProperties.getPaths().forEach(path -> {
+    for (String path : sanitizeProperties.getPaths()) {
       Sanitize.sanitize(path, event);
-    });
+    }
     webLogStream.webLogOutput().send(MessageBuilder.withPayload(event).build());
   }
 }

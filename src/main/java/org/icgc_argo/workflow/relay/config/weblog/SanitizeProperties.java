@@ -1,11 +1,10 @@
 package org.icgc_argo.workflow.relay.config.weblog;
 
+import java.util.List;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-
-import java.util.List;
 
 @Profile("weblog")
 @Data
@@ -14,4 +13,3 @@ import java.util.List;
 public class SanitizeProperties {
   List<String> paths;
 }
-
