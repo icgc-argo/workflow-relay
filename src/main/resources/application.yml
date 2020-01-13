@@ -64,3 +64,8 @@ elastic:
   port: 9200
   workflowIndex: workflow
   taskIndex: task
+
+sanitize:
+  paths:
+    - "metadata.parameters.api_token"
+    - "metadata.parameters.example_secret"
