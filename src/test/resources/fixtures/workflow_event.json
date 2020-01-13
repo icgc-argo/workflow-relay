@@ -3,7 +3,9 @@
     "parameters": {
       "input": {
         "class": "File",
-        "path": "ftp://ftp-private.ebi.ac.uk/upload/foivos/test.txt"
+        "path": "ftp://ftp-private.ebi.ac.uk/upload/foivos/test.txt",
+        "superSecretNumber": 5,
+        "otherSuperSecretNumber": 900.1
       }
     },
     "workflow": {
