@@ -10,6 +10,12 @@ import lombok.val;
 
 public class Sanitize {
 
+  /**
+   * Sanitizes a given JSON path through a mutation, assuming it is a value node.
+   *
+   * @param jsonPath Path to value node as a JSON path (dot delimited path)
+   * @param json The JSON data
+   */
   public static void sanitize(@NonNull String jsonPath, @NonNull JsonNode json) {
     val paths = jsonPath.split("\\.");
 
