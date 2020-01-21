@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.icgc_argo.workflow.relay.entities.index.TaskDocument;
-import org.icgc_argo.workflow.relay.entities.index.TaskState;
-import org.icgc_argo.workflow.relay.entities.index.WorkflowDocument;
-import org.icgc_argo.workflow.relay.entities.index.WorkflowState;
+import org.icgc_argo.workflow.relay.entities.index.*;
 import org.icgc_argo.workflow.relay.entities.metadata.TaskEvent;
 import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
 
@@ -29,19 +26,24 @@ public class DocumentConverter {
         "Cannot convert workflow event to workflow document: workflow is null.");
 
     val workflow = workflowEvent.getMetadata().getWorkflow();
+
+    val engineParams = EngineParameters.builder()
+        .revision(workflow.getRevision())
+        .resume(workflow.getResume())
+        .build();
+
     val doc =
         WorkflowDocument.builder()
             .runId(workflowEvent.getRunId())
             .runName(workflowEvent.getRunName())
             .state(WorkflowState.fromValue(workflowEvent.getEvent()))
             .parameters(workflowEvent.getMetadata().getParameters())
+            .engineParameters(engineParams)
             .startTime(workflow.getStart().toInstant())
             .repository(workflow.getRepository())
-            .revision(workflow.getRevision())
             .commandLine(workflow.getCommandLine())
             .errorReport(workflow.getErrorReport())
             .exitStatus(workflow.getExitStatus())
-            .resume(workflow.getResume())
             .success(workflow.getSuccess())
             .duration(workflow.getDuration());
 

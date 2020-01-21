@@ -35,7 +35,7 @@ public class Workflow {
   private String errorReport;
 
   /** Was this a resume run */
-  @NonNull private Boolean resume;
+  @NonNull private String resume;
 
   /** Did the workflow succeed */
   @NonNull private Boolean success;

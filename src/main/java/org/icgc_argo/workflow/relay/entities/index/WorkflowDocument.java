@@ -23,6 +23,8 @@ public class WorkflowDocument {
 
   private Map<String, Object> parameters;
 
+  private EngineParameters engineParameters;
+
   /** When the command started executing */
   @NonNull private Instant startTime;
 
@@ -32,9 +34,6 @@ public class WorkflowDocument {
   /** The repository url */
   private String repository;
 
-  /** The repository release/tag/branch */
-  private String revision;
-
   /** Exit code of the program */
   private Integer exitStatus;
 
@@ -43,9 +42,6 @@ public class WorkflowDocument {
 
   /** A URL to retrieve standard error logs of the workflow run or task */
   private String errorReport;
-
-  /** Was this a resume run */
-  @NonNull private Boolean resume;
 
   /** Did the workflow succeed */
   @NonNull private Boolean success;
