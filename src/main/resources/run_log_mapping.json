@@ -20,9 +20,6 @@
       "repository": {
         "type": "text"
       },
-      "revision": {
-        "type": "text"
-      },
       "exitStatus": {
         "type": "integer"
       },
@@ -31,9 +28,6 @@
       },
       "errorReport": {
         "type": "text"
-      },
-      "resume": {
-        "type": "boolean"
       },
       "success": {
         "type": "boolean"
