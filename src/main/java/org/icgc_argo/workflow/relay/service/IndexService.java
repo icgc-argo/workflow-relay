@@ -1,5 +1,6 @@
 package org.icgc_argo.workflow.relay.service;
 
+import static java.lang.String.format;
 import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -65,14 +66,15 @@ public class IndexService {
     // serialize index objects to json
     val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
 
-    val id = event.path("runId").asText();
-    log.info("Indexing workflow information for run: {}", id);
+    val runId = event.path("runId").asText();
+    val runName = event.path("runName").asText();
+    log.info(format("Indexing workflow information for run with runName: { %s }, runId: { %s }", runName, runId));
     val request =
-        new UpdateRequest(workflowIndex, id)
+        new UpdateRequest(workflowIndex, runName)
             .upsert(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON)
             .doc(
                 MAPPER.writeValueAsBytes(jsonNode),
-                XContentType.JSON); // TODO: Handle these exceptions
+                XContentType.JSON);
     esClient.update(request, RequestOptions.DEFAULT);
   }
 
@@ -86,7 +88,7 @@ public class IndexService {
     log.info("Indexing task information for run: {}", id);
     val request = new IndexRequest(taskIndex);
     request.source(
-        MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON); // TODO: Handle these exceptions
+        MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
     esClient.index(request, RequestOptions.DEFAULT);
   }
 }
