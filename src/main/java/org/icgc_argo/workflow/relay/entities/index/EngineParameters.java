@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class EngineParameters {
+  String workDir;
   String revision;
   String resume;
 }

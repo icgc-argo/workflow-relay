@@ -25,6 +25,9 @@ public class Workflow {
   /** The repository release/tag/branch */
   private String revision;
 
+  /** The run working directory */
+  @NonNull private String workDir;
+
   /** Exit code of the program */
   private Integer exitStatus;
 
