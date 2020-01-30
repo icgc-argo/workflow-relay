@@ -30,6 +30,7 @@ public class DocumentConverter {
     val engineParams = EngineParameters.builder()
         .revision(workflow.getRevision())
         .resume(workflow.getResume())
+        .workDir(workflow.getWorkDir())
         .build();
 
     val doc =

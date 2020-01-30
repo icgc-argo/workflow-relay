@@ -38,7 +38,6 @@ public class TestDocumentConverter {
 
     val expected = workflowEvent.getMetadata().getWorkflow();
     val doc = DocumentConverter.buildWorkflowDocument(workflowEvent);
-
     assertEquals(workflowEvent.getRunId(), doc.getRunId());
     assertEquals(workflowEvent.getRunName(), doc.getRunName());
     assertEquals(doc.getState(), WorkflowState.COMPLETE);
@@ -49,6 +48,9 @@ public class TestDocumentConverter {
     assertEquals(expected.getErrorReport(), doc.getErrorReport());
     assertEquals(expected.getExitStatus(), doc.getExitStatus());
     assertEquals(expected.getCommandLine(), doc.getCommandLine());
+    assertEquals(expected.getWorkDir(), doc.getEngineParameters().getWorkDir());
+    assertEquals(expected.getRevision(), doc.getEngineParameters().getRevision());
+    assertEquals(expected.getResume(), doc.getEngineParameters().getResume());
   }
 
   @Test
