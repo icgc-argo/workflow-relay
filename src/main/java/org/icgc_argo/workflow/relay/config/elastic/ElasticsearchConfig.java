@@ -29,7 +29,6 @@ public class ElasticsearchConfig {
                     config
                         .setConnectTimeout(15_000)
                         .setConnectionRequestTimeout(15_000)
-                        .setSocketTimeout(15_000)
-                        .setAuthenticationEnabled(true)));
+                        .setSocketTimeout(15_000)));
   }
 }
