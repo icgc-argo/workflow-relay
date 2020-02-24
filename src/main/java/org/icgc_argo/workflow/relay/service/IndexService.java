@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.util.Base64;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,9 @@ public class IndexService {
   private final RestHighLevelClient esClient;
   private final String workflowIndex;
   private final String taskIndex;
+  private final String userName;
+  private final String password;
+  private final boolean useAuthentication;
 
   @Autowired
   public IndexService(
@@ -53,6 +57,9 @@ public class IndexService {
     this.esClient = esClient;
     this.workflowIndex = elasticsearchProperties.getWorkflowIndex();
     this.taskIndex = elasticsearchProperties.getTaskIndex();
+    this.userName = elasticsearchProperties.getUserName();
+    this.password = elasticsearchProperties.getPassword();
+    this.useAuthentication = elasticsearchProperties.isUseAuthentication();
   }
 
   @SneakyThrows
@@ -68,14 +75,22 @@ public class IndexService {
 
     val runId = event.path("runId").asText();
     val runName = event.path("runName").asText();
-    log.info(format("Indexing workflow information for run with runName: { %s }, runId: { %s }", runName, runId));
+    log.info(
+        format(
+            "Indexing workflow information for run with runName: { %s }, runId: { %s }",
+            runName, runId));
     val request =
         new UpdateRequest(workflowIndex, runName)
             .upsert(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON)
-            .doc(
-                MAPPER.writeValueAsBytes(jsonNode),
-                XContentType.JSON);
-    esClient.update(request, RequestOptions.DEFAULT);
+            .doc(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
+    RequestOptions options;
+    if (useAuthentication) {
+      val token = Base64.getEncoder().encode((userName + ":" + password).getBytes());
+      options = RequestOptions.DEFAULT.toBuilder().addHeader("Authorization", token.toString()).build();
+    } else {
+      options = RequestOptions.DEFAULT;
+    }
+    esClient.update(request, options);
   }
 
   @SneakyThrows
@@ -87,8 +102,7 @@ public class IndexService {
     val id = event.path("runId").asText();
     log.info("Indexing task information for run: {}", id);
     val request = new IndexRequest(taskIndex);
-    request.source(
-        MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
+    request.source(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
     esClient.index(request, RequestOptions.DEFAULT);
   }
 }
