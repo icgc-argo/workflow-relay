@@ -27,11 +27,12 @@ public class DocumentConverter {
 
     val workflow = workflowEvent.getMetadata().getWorkflow();
 
-    val engineParams = EngineParameters.builder()
-        .revision(workflow.getRevision())
-        .resume(workflow.getResume())
-        .workDir(workflow.getWorkDir())
-        .build();
+    val engineParams =
+        EngineParameters.builder()
+            .revision(workflow.getRevision())
+            .resume(workflow.getResume())
+            .workDir(workflow.getWorkDir())
+            .build();
 
     val doc =
         WorkflowDocument.builder()
