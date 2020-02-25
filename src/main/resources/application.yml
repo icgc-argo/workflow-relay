@@ -64,6 +64,9 @@ elastic:
   port: 9200
   workflowIndex: workflow
   taskIndex: task
+  useAuthentication: false
+  userName: elastic
+  password: testing
 
 sanitize:
   paths:

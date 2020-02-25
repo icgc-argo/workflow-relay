@@ -13,6 +13,9 @@ public class ElasticsearchProperties {
 
   String host;
   Integer port;
+  String userName;
+  String password;
+  boolean useAuthentication;
   String workflowIndex;
   String taskIndex;
 }
