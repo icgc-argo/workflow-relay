@@ -64,7 +64,7 @@ elastic:
   port: 9200
   useHttps: false
   useAuthentication: false
-  userName: elastic
+  username: elastic
   password: testing
   workflowIndex: workflow
   taskIndex: task
