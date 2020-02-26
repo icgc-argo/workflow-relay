@@ -34,14 +34,14 @@ public class ElasticsearchConfig {
     final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
     credentialsProvider.setCredentials(
         AuthScope.ANY,
-        new UsernamePasswordCredentials(properties.getUserName(), properties.getPassword()));
+        new UsernamePasswordCredentials(properties.getUsername(), properties.getPassword()));
 
     return new RestHighLevelClient(
         RestClient.builder(
                 new HttpHost(
                     properties.getHost(),
                     properties.getPort(),
-                    properties.isUseHttps() ? "https" : "http"))
+                    properties.getUseHttps() ? "https" : "http"))
             .setRequestConfigCallback(
                 config ->
                     config
@@ -61,7 +61,7 @@ public class ElasticsearchConfig {
   @Bean
   public RestHighLevelClient restHighLevelClient() {
 
-    if (properties.isUseAuthentication()) {
+    if (properties.getUseAuthentication()) {
       return secureRestHighLevelClient();
     }
 
@@ -70,7 +70,7 @@ public class ElasticsearchConfig {
                 new HttpHost(
                     properties.getHost(),
                     properties.getPort(),
-                    properties.isUseHttps() ? "https" : "http"))
+                    properties.getUseHttps() ? "https" : "http"))
             .setRequestConfigCallback(
                 config ->
                     config
