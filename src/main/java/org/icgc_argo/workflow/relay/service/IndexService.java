@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.util.Base64;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +45,6 @@ public class IndexService {
   private final RestHighLevelClient esClient;
   private final String workflowIndex;
   private final String taskIndex;
-  private final String userName;
-  private final String password;
-  private final boolean useAuthentication;
 
   @Autowired
   public IndexService(
@@ -57,9 +53,6 @@ public class IndexService {
     this.esClient = esClient;
     this.workflowIndex = elasticsearchProperties.getWorkflowIndex();
     this.taskIndex = elasticsearchProperties.getTaskIndex();
-    this.userName = elasticsearchProperties.getUserName();
-    this.password = elasticsearchProperties.getPassword();
-    this.useAuthentication = elasticsearchProperties.isUseAuthentication();
   }
 
   @SneakyThrows
@@ -83,14 +76,7 @@ public class IndexService {
         new UpdateRequest(workflowIndex, runName)
             .upsert(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON)
             .doc(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
-    RequestOptions options;
-    if (useAuthentication) {
-      val token = Base64.getEncoder().encode((userName + ":" + password).getBytes());
-      options = RequestOptions.DEFAULT.toBuilder().addHeader("Authorization", token.toString()).build();
-    } else {
-      options = RequestOptions.DEFAULT;
-    }
-    esClient.update(request, options);
+    esClient.update(request, RequestOptions.DEFAULT);
   }
 
   @SneakyThrows

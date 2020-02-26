@@ -62,11 +62,12 @@ spring:
 elastic:
   host: localhost
   port: 9200
-  workflowIndex: workflow
-  taskIndex: task
+  useHttps: false
   useAuthentication: false
   userName: elastic
   password: testing
+  workflowIndex: workflow
+  taskIndex: task
 
 sanitize:
   paths:

@@ -13,6 +13,7 @@ public class ElasticsearchProperties {
 
   String host;
   Integer port;
+  boolean useHttps;
   String userName;
   String password;
   boolean useAuthentication;
