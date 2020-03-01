@@ -1,7 +1,6 @@
 ###############################
 # Maven builder
 ###############################
-# -alpine-slim image does not support --release flag
 FROM adoptopenjdk/openjdk11:jdk-11.0.6_10-alpine-slim as builder
 WORKDIR /usr/src/app
 COPY . .
