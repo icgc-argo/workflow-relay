@@ -15,12 +15,12 @@ public enum WorkflowState {
 
   @NonNull private final String value;
 
-  public static WorkflowState fromValue(@NonNull String text) {
+  public static WorkflowState fromValueAndSuccess(@NonNull String text, @NonNull boolean success) {
     if (text.equalsIgnoreCase("started")) {
       return WorkflowState.RUNNING;
-    } else if (text.equalsIgnoreCase("completed")) {
+    } else if (text.equalsIgnoreCase("completed") && success) {
       return WorkflowState.COMPLETE;
-    } else if (text.equalsIgnoreCase("error")) {
+    } else if (text.equalsIgnoreCase("completed") && !success) {
       return WorkflowState.EXECUTOR_ERROR;
     } else return WorkflowState.UNKNOWN;
   }

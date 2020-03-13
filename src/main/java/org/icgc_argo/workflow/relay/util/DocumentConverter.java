@@ -34,11 +34,13 @@ public class DocumentConverter {
             .workDir(workflow.getWorkDir())
             .build();
 
+    val success = workflow.getSuccess();
+
     val doc =
         WorkflowDocument.builder()
             .runId(workflowEvent.getRunId())
             .runName(workflowEvent.getRunName())
-            .state(WorkflowState.fromValue(workflowEvent.getEvent()))
+            .state(WorkflowState.fromValueAndSuccess(workflowEvent.getEvent(), success))
             .parameters(workflowEvent.getMetadata().getParameters())
             .engineParameters(engineParams)
             .startTime(workflow.getStart().toInstant())
@@ -46,7 +48,7 @@ public class DocumentConverter {
             .commandLine(workflow.getCommandLine())
             .errorReport(workflow.getErrorReport())
             .exitStatus(workflow.getExitStatus())
-            .success(workflow.getSuccess())
+            .success(success)
             .duration(workflow.getDuration());
 
     val completeTime = workflow.getComplete();
