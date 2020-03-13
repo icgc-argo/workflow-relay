@@ -31,6 +31,8 @@ public class TestDocumentConverter {
           .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
           .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
 
+
+
   @Test
   public void testConvertWorkflowJson() {
     val workflowEvent =
@@ -41,6 +43,28 @@ public class TestDocumentConverter {
     assertEquals(workflowEvent.getRunId(), doc.getRunId());
     assertEquals(workflowEvent.getRunName(), doc.getRunName());
     assertEquals(doc.getState(), WorkflowState.COMPLETE);
+    assertEquals(workflowEvent.getMetadata().getParameters(), doc.getParameters());
+    assertEquals(expected.getStart().toInstant(), doc.getStartTime());
+    assertEquals(expected.getComplete().toInstant(), doc.getCompleteTime());
+    assertEquals(expected.getRepository(), doc.getRepository());
+    assertEquals(expected.getErrorReport(), doc.getErrorReport());
+    assertEquals(expected.getExitStatus(), doc.getExitStatus());
+    assertEquals(expected.getCommandLine(), doc.getCommandLine());
+    assertEquals(expected.getWorkDir(), doc.getEngineParameters().getWorkDir());
+    assertEquals(expected.getRevision(), doc.getEngineParameters().getRevision());
+    assertEquals(expected.getResume(), doc.getEngineParameters().getResume());
+  }
+
+  @Test
+  public void testConvertWorkflowJsonWithError() {
+    val workflowEvent =
+        loadJsonFixture(this.getClass(), "workflow_event_error.json", WorkflowEvent.class, MAPPER);
+
+    val expected = workflowEvent.getMetadata().getWorkflow();
+    val doc = DocumentConverter.buildWorkflowDocument(workflowEvent);
+    assertEquals(workflowEvent.getRunId(), doc.getRunId());
+    assertEquals(workflowEvent.getRunName(), doc.getRunName());
+    assertEquals(doc.getState(), WorkflowState.EXECUTOR_ERROR);
     assertEquals(workflowEvent.getMetadata().getParameters(), doc.getParameters());
     assertEquals(expected.getStart().toInstant(), doc.getStartTime());
     assertEquals(expected.getComplete().toInstant(), doc.getCompleteTime());

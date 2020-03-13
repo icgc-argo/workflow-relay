@@ -9,6 +9,8 @@ public enum WorkflowState {
 
   COMPLETE("COMPLETE"),
 
+  EXECUTOR_ERROR("EXECUTOR_ERROR"),
+
   UNKNOWN("UNKNOWN");
 
   @NonNull private final String value;
@@ -18,6 +20,8 @@ public enum WorkflowState {
       return WorkflowState.RUNNING;
     } else if (text.equalsIgnoreCase("completed")) {
       return WorkflowState.COMPLETE;
+    } else if (text.equalsIgnoreCase("error")) {
+      return WorkflowState.EXECUTOR_ERROR;
     } else return WorkflowState.UNKNOWN;
   }
 
