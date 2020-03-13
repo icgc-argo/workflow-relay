@@ -1,9 +1,5 @@
 package org.icgc_argo.workflow.relay.service;
 
-import static org.icgc_argo.workflow.relay.util.Fixture.loadJsonFixture;
-import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
-import static org.junit.Assert.assertEquals;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -19,6 +15,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.icgc_argo.workflow.relay.util.Fixture.loadJsonFixture;
+import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
+import static org.junit.Assert.assertEquals;
+
 @Slf4j
 @RunWith(SpringRunner.class)
 public class TestDocumentConverter {
@@ -30,8 +30,6 @@ public class TestDocumentConverter {
           .configure(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS, false)
           .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
           .configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
-
-
 
   @Test
   public void testConvertWorkflowJson() {
