@@ -48,6 +48,7 @@ public class TestDocumentConverter {
     assertEquals(expected.getErrorReport(), doc.getErrorReport());
     assertEquals(expected.getExitStatus(), doc.getExitStatus());
     assertEquals(expected.getCommandLine(), doc.getCommandLine());
+    assertEquals(expected.getProjectDir(), doc.getEngineParameters().getProjectDir());
     assertEquals(expected.getWorkDir(), doc.getEngineParameters().getWorkDir());
     assertEquals(expected.getRevision(), doc.getEngineParameters().getRevision());
     assertEquals(expected.getResume(), doc.getEngineParameters().getResume());

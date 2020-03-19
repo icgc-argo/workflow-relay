@@ -31,6 +31,7 @@ public class DocumentConverter {
         EngineParameters.builder()
             .revision(workflow.getRevision())
             .resume(workflow.getResume())
+            .projectDir(workflow.getProjectDir())
             .workDir(workflow.getWorkDir())
             .build();
 

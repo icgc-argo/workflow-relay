@@ -25,6 +25,9 @@ public class Workflow {
   /** The repository release/tag/branch */
   private String revision;
 
+  /** The run project directory */
+  @NonNull private String projectDir;
+
   /** The run working directory */
   @NonNull private String workDir;
 
