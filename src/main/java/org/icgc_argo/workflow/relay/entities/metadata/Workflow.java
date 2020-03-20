@@ -25,10 +25,13 @@ public class Workflow {
   /** The repository release/tag/branch */
   private String revision;
 
-  /** The run project directory */
+  /** The run's launch directory (where nextflow config and cache are stored) */
+  @NonNull private String launchDir;
+
+  /** The run's project directory (where the git repo is stored) */
   @NonNull private String projectDir;
 
-  /** The run working directory */
+  /** The run's working directory (scratch space) */
   @NonNull private String workDir;
 
   /** Exit code of the program */

@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class EngineParameters {
+  String launchDir;
   String projectDir;
   String workDir;
   String revision;
