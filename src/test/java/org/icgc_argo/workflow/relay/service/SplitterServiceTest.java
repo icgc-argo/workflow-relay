@@ -30,7 +30,7 @@ public class SplitterServiceTest {
   @Test
   @SneakyThrows
   public void testWorkflowSplit() {
-    val resource = this.getClass().getClassLoader().getResource("fixtures/workflow_event.json");
+    val resource = this.getClass().getClassLoader().getResource("fixtures/nextflow_workflow_event.json");
     assert resource != null;
     val content = Files.readString(Path.of(resource.toURI()));
 
@@ -46,7 +46,7 @@ public class SplitterServiceTest {
   @Test
   @SneakyThrows
   public void testTaskSplit() {
-    val resource = this.getClass().getClassLoader().getResource("fixtures/task_event.json");
+    val resource = this.getClass().getClassLoader().getResource("fixtures/nextflow_task_event.json");
     assert resource != null;
     val content = Files.readString(Path.of(resource.toURI()));
 

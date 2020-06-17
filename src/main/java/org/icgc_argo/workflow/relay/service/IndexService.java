@@ -19,9 +19,9 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.icgc_argo.workflow.relay.config.elastic.ElasticsearchProperties;
 import org.icgc_argo.workflow.relay.config.stream.IndexStream;
-import org.icgc_argo.workflow.relay.entities.metadata.TaskEvent;
-import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
-import org.icgc_argo.workflow.relay.util.DocumentConverter;
+import org.icgc_argo.workflow.relay.entities.nextflow.TaskEvent;
+import org.icgc_argo.workflow.relay.entities.nextflow.WorkflowEvent;
+import org.icgc_argo.workflow.relay.util.NextflowDocumentConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
@@ -61,7 +61,7 @@ public class IndexService {
     val workflowEvent = MAPPER.treeToValue(event, WorkflowEvent.class);
 
     // convert metadata objects to index objects
-    val doc = DocumentConverter.buildWorkflowDocument(workflowEvent);
+    val doc = NextflowDocumentConverter.buildWorkflowDocument(workflowEvent);
 
     // serialize index objects to json
     val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
@@ -83,7 +83,7 @@ public class IndexService {
   @StreamListener(IndexStream.TASK)
   public void indexTask(JsonNode event) {
     val taskEvent = MAPPER.treeToValue(event, TaskEvent.class);
-    val doc = DocumentConverter.buildTaskDocument(taskEvent);
+    val doc = NextflowDocumentConverter.buildTaskDocument(taskEvent);
     val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
     val id = event.path("runId").asText();
     log.info("Indexing task information for run: {}", id);
