@@ -11,6 +11,8 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
+import static java.lang.String.format;
+
 @Profile("splitter")
 @Slf4j
 @Service
@@ -29,10 +31,12 @@ public class SplitterService {
   @StreamListener(SplitStream.WEBLOG)
   public void split(JsonNode event) {
     if (event.has("trace")) {
-      log.debug("Processing task event");
+      // NEXTFLOW TASK EVENT
+      log.debug(format("Processing task (Nextflow) event for runId: { %s }, runName: { %s }", event.path("runId").asText(), event.path("runName").asText()));
       taskOutput.send(MessageBuilder.withPayload(event).build());
     } else if (!event.path("metadata").path("workflow").isMissingNode()) {
-      log.debug("Processing workflow event");
+      // NEXTFLOW WORKFLOW EVENT
+      log.debug(format("Processing workflow (Nextflow) event for runId: { %s }, runName: { %s }", event.path("runId").asText(), event.path("runName").asText()));
       workflowOutput.send(MessageBuilder.withPayload(event).build());
     } else {
       log.error("Unhandled event: {}", event.toString());
