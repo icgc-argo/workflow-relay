@@ -19,9 +19,9 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.icgc_argo.workflow.relay.config.elastic.ElasticsearchProperties;
 import org.icgc_argo.workflow.relay.config.stream.IndexStream;
-import org.icgc_argo.workflow.relay.entities.metadata.TaskEvent;
-import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
-import org.icgc_argo.workflow.relay.util.DocumentConverter;
+import org.icgc_argo.workflow.relay.entities.nextflow.TaskEvent;
+import org.icgc_argo.workflow.relay.entities.nextflow.WorkflowEvent;
+import org.icgc_argo.workflow.relay.util.NextflowDocumentConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
@@ -58,22 +58,20 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.WORKFLOW)
   public void indexWorkflow(JsonNode event) {
+    // Convert nextflow workflow event to workflow index doc
     val workflowEvent = MAPPER.treeToValue(event, WorkflowEvent.class);
-
-    // convert metadata objects to index objects
-    val doc = DocumentConverter.buildWorkflowDocument(workflowEvent);
+    val doc = NextflowDocumentConverter.buildWorkflowDocument(workflowEvent);
 
     // serialize index objects to json
     val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
 
-    val runId = event.path("runId").asText();
-    val runName = event.path("runName").asText();
+    // Log and index
     log.info(
         format(
-            "Indexing workflow information for run with runName: { %s }, runId: { %s }",
-            runName, runId));
+            "Indexing workflow information for run with runId: { %s }, sessionId: { %s }",
+            doc.getRunId(), doc.getSessionId()));
     val request =
-        new UpdateRequest(workflowIndex, runName)
+        new UpdateRequest(workflowIndex, doc.getRunId())
             .upsert(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON)
             .doc(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
     esClient.update(request, RequestOptions.DEFAULT);
@@ -82,11 +80,15 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.TASK)
   public void indexTask(JsonNode event) {
+    // Convert nextflow task event to task index doc
     val taskEvent = MAPPER.treeToValue(event, TaskEvent.class);
-    val doc = DocumentConverter.buildTaskDocument(taskEvent);
+    val doc = NextflowDocumentConverter.buildTaskDocument(taskEvent);
+
+    // serialize index objects to json
     val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
-    val id = event.path("runId").asText();
-    log.info("Indexing task information for run: {}", id);
+
+    // Log and index
+    log.info("Indexing task information for run: {}", doc.getRunId());
     val request = new IndexRequest(taskIndex);
     request.source(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
     esClient.index(request, RequestOptions.DEFAULT);

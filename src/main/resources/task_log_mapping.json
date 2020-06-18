@@ -5,7 +5,7 @@
       "runId": {
         "type": "keyword"
       },
-      "runName": {
+      "sessionId": {
         "type": "keyword"
       },
       "taskId": {

@@ -15,8 +15,8 @@ public class WorkflowDocument {
   /** Workflow run ID */
   @NonNull private String runId;
 
-  /** Workflow run name */
-  @NonNull private String runName;
+  /** Workflow session ID */
+  @NonNull private String sessionId;
 
   /** The overall state of the workflow run, mapped to WorkflowEvent - event */
   @NonNull private WorkflowState state;

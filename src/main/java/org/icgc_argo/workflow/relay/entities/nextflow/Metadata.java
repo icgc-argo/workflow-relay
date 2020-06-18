@@ -1,4 +1,4 @@
-package org.icgc_argo.workflow.relay.entities.metadata;
+package org.icgc_argo.workflow.relay.entities.nextflow;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Map;
