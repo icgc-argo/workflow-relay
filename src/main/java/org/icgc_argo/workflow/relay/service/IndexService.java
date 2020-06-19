@@ -1,6 +1,7 @@
 package org.icgc_argo.workflow.relay.service;
 
 import static java.lang.String.format;
+import static org.icgc_argo.workflow.relay.entities.index.WorkflowState.COMPLETE;
 import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -17,6 +18,7 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.script.Script;
 import org.icgc_argo.workflow.relay.config.elastic.ElasticsearchProperties;
 import org.icgc_argo.workflow.relay.config.stream.IndexStream;
 import org.icgc_argo.workflow.relay.entities.nextflow.TaskEvent;
@@ -72,6 +74,8 @@ public class IndexService {
             doc.getRunId(), doc.getSessionId()));
     val request =
         new UpdateRequest(workflowIndex, doc.getRunId())
+            // DO NOT OVERWRITE COMPLETE WORKFLOW LOGS (ex. out of order message processing)
+            .script(new Script(format("ctx._source.state != \"%s\"", String.valueOf(COMPLETE))))
             .upsert(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON)
             .doc(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
     esClient.update(request, RequestOptions.DEFAULT);
