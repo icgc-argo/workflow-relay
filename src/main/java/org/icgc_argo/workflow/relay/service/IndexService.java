@@ -1,9 +1,5 @@
 package org.icgc_argo.workflow.relay.service;
 
-import static java.lang.String.format;
-import static org.icgc_argo.workflow.relay.entities.index.WorkflowState.COMPLETE;
-import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,14 +9,15 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.script.Script;
 import org.icgc_argo.workflow.relay.config.elastic.ElasticsearchProperties;
 import org.icgc_argo.workflow.relay.config.stream.IndexStream;
+import org.icgc_argo.workflow.relay.entities.index.WorkflowState;
 import org.icgc_argo.workflow.relay.entities.nextflow.TaskEvent;
 import org.icgc_argo.workflow.relay.entities.nextflow.WorkflowEvent;
 import org.icgc_argo.workflow.relay.util.NextflowDocumentConverter;
@@ -29,6 +26,10 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+
+import static java.lang.String.format;
+import static java.lang.String.valueOf;
+import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
 
 @Profile("index")
 @Slf4j
@@ -72,13 +73,25 @@ public class IndexService {
         format(
             "Indexing workflow information for run with runId: { %s }, sessionId: { %s }",
             doc.getRunId(), doc.getSessionId()));
-    val request =
-        new UpdateRequest(workflowIndex, doc.getRunId())
-            // DO NOT OVERWRITE COMPLETE WORKFLOW LOGS (ex. out of order message processing)
-            .script(new Script(format("ctx._source.state != \"%s\"", String.valueOf(COMPLETE))))
-            .upsert(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON)
-            .doc(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
-    esClient.update(request, RequestOptions.DEFAULT);
+
+    // Check for existing document and do not update if already
+    // exists with state WorkflowState.COMPLETE
+    GetRequest getRequest = new GetRequest(workflowIndex, doc.getRunId());
+    val existingDoc = esClient.get(getRequest, RequestOptions.DEFAULT);
+
+    if (existingDoc.isExists()
+        && existingDoc.getField("state").toString().equals(valueOf(WorkflowState.COMPLETE))) {
+      log.info(
+          format(
+              "Skipping document upsert as workflow information for run with runId: { %s }, sessionId: { %s } already exists in index with state { %s }",
+              doc.getRunId(), doc.getSessionId(), valueOf(WorkflowState.COMPLETE)));
+    } else {
+      val request =
+          new UpdateRequest(workflowIndex, doc.getRunId())
+              .upsert(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON)
+              .doc(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
+      esClient.update(request, RequestOptions.DEFAULT);
+    }
   }
 
   @SneakyThrows
