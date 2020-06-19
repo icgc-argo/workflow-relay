@@ -10,6 +10,10 @@ spring:
         binder:
           brokers: localhost:9092
           autoCreateTopics: true
+        # SET CONFIG BELOW TO RESET ALL TOPIC OFFSETS
+        # configuration:
+        # groupId: some-unique-group-id
+        # autoOffsetReset: earliest
         bindings:
           weblogout:
             consumer:
@@ -23,6 +27,9 @@ spring:
               dlqName: workflow_dlq
               autoCommitOnError: true
               autoCommitOffset: true
+              # SET THESE PROPS TO RESET JUST ONE TOPIC'S OFFSETS
+              # resetOffsets: true
+              # startOffset: earliest
           taskindex:
             consumer:
               enableDlq: true
