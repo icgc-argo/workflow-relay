@@ -77,10 +77,14 @@ public class IndexService {
     // Check for existing document and do not update if already
     // exists with state WorkflowState.COMPLETE
     GetRequest getRequest = new GetRequest(workflowIndex, doc.getRunId());
-    val existingDoc = esClient.get(getRequest, RequestOptions.DEFAULT);
+    val getResponse = esClient.get(getRequest, RequestOptions.DEFAULT);
 
-    if (existingDoc.isExists()
-        && existingDoc.getField("state").toString().equals(valueOf(WorkflowState.COMPLETE))) {
+    if (getResponse.isExists()
+        && getResponse
+            .getSourceAsMap()
+            .get("state")
+            .toString()
+            .equals(valueOf(WorkflowState.COMPLETE))) {
       log.info(
           format(
               "Skipping document upsert as workflow information for run with runId: { %s }, sessionId: { %s } already exists in index with state { %s }",
