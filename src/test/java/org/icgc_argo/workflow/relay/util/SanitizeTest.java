@@ -17,7 +17,7 @@ public class SanitizeTest {
     // ftp://ftp-private.ebi.ac.uk/upload/foivos/test.txt should be hashed to
     // 84b70f172cb4506996c77108036f068f
 
-    val resource = this.getClass().getClassLoader().getResource("fixtures/workflow_event.json");
+    val resource = this.getClass().getClassLoader().getResource("fixtures/nextflow_workflow_event.json");
     assert resource != null;
     val content = Files.readString(Path.of(resource.toURI()));
 
@@ -33,7 +33,7 @@ public class SanitizeTest {
   @Test
   @SneakyThrows
   public void testSanitizeInteger() {
-    val resource = this.getClass().getClassLoader().getResource("fixtures/workflow_event.json");
+    val resource = this.getClass().getClassLoader().getResource("fixtures/nextflow_workflow_event.json");
     assert resource != null;
     val content = Files.readString(Path.of(resource.toURI()));
 
@@ -49,7 +49,7 @@ public class SanitizeTest {
   @Test
   @SneakyThrows
   public void testSanitizeNumber() {
-    val resource = this.getClass().getClassLoader().getResource("fixtures/workflow_event.json");
+    val resource = this.getClass().getClassLoader().getResource("fixtures/nextflow_workflow_event.json");
     assert resource != null;
     val content = Files.readString(Path.of(resource.toURI()));
 

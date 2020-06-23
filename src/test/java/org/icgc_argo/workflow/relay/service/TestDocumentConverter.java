@@ -8,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.icgc_argo.workflow.relay.entities.index.TaskState;
 import org.icgc_argo.workflow.relay.entities.index.WorkflowState;
-import org.icgc_argo.workflow.relay.entities.metadata.TaskEvent;
-import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
-import org.icgc_argo.workflow.relay.util.DocumentConverter;
+import org.icgc_argo.workflow.relay.entities.nextflow.TaskEvent;
+import org.icgc_argo.workflow.relay.entities.nextflow.WorkflowEvent;
+import org.icgc_argo.workflow.relay.util.NextflowDocumentConverter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -34,12 +34,12 @@ public class TestDocumentConverter {
   @Test
   public void testConvertWorkflowJson() {
     val workflowEvent =
-        loadJsonFixture(this.getClass(), "workflow_event.json", WorkflowEvent.class, MAPPER);
+        loadJsonFixture(this.getClass(), "nextflow_workflow_event.json", WorkflowEvent.class, MAPPER);
 
     val expected = workflowEvent.getMetadata().getWorkflow();
-    val doc = DocumentConverter.buildWorkflowDocument(workflowEvent);
-    assertEquals(workflowEvent.getRunId(), doc.getRunId());
-    assertEquals(workflowEvent.getRunName(), doc.getRunName());
+    val doc = NextflowDocumentConverter.buildWorkflowDocument(workflowEvent);
+    assertEquals(workflowEvent.getRunName(), doc.getRunId());
+    assertEquals(workflowEvent.getRunId(), doc.getSessionId());
     assertEquals(doc.getState(), WorkflowState.COMPLETE);
     assertEquals(workflowEvent.getMetadata().getParameters(), doc.getParameters());
     assertEquals(expected.getStart().toInstant(), doc.getStartTime());
@@ -58,12 +58,12 @@ public class TestDocumentConverter {
   @Test
   public void testConvertWorkflowJsonWithError() {
     val workflowEvent =
-        loadJsonFixture(this.getClass(), "workflow_event_error.json", WorkflowEvent.class, MAPPER);
+        loadJsonFixture(this.getClass(), "nextflow_workflow_event_error.json", WorkflowEvent.class, MAPPER);
 
     val expected = workflowEvent.getMetadata().getWorkflow();
-    val doc = DocumentConverter.buildWorkflowDocument(workflowEvent);
-    assertEquals(workflowEvent.getRunId(), doc.getRunId());
-    assertEquals(workflowEvent.getRunName(), doc.getRunName());
+    val doc = NextflowDocumentConverter.buildWorkflowDocument(workflowEvent);
+    assertEquals(workflowEvent.getRunName(), doc.getRunId());
+    assertEquals(workflowEvent.getRunId(), doc.getSessionId());
     assertEquals(doc.getState(), WorkflowState.EXECUTOR_ERROR);
     assertEquals(workflowEvent.getMetadata().getParameters(), doc.getParameters());
     assertEquals(expected.getStart().toInstant(), doc.getStartTime());
@@ -81,12 +81,12 @@ public class TestDocumentConverter {
 
   @Test
   public void testLoadTaskJson() {
-    val taskEvent = loadJsonFixture(this.getClass(), "task_event.json", TaskEvent.class, MAPPER);
+    val taskEvent = loadJsonFixture(this.getClass(), "nextflow_task_event.json", TaskEvent.class, MAPPER);
     val trace = taskEvent.getTrace();
-    val doc = DocumentConverter.buildTaskDocument(taskEvent);
+    val doc = NextflowDocumentConverter.buildTaskDocument(taskEvent);
 
-    assertEquals(taskEvent.getRunId(), doc.getRunId());
-    assertEquals(taskEvent.getRunName(), doc.getRunName());
+    assertEquals(taskEvent.getRunName(), doc.getRunId());
+    assertEquals(taskEvent.getRunId(), doc.getSessionId());
     assertEquals(trace.getTask_id(), doc.getTaskId());
     assertEquals(trace.getName(), doc.getName());
     assertEquals(trace.getProcess(), doc.getProcess());

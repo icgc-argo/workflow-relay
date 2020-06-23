@@ -16,8 +16,8 @@ public class TaskDocument {
   /** Workflow run ID */
   @NonNull private String runId;
 
-  /** Workflow run name */
-  @NonNull private String runName;
+  /** Workflow session ID */
+  @NonNull private String sessionId;
 
   /** Task id */
   @NonNull private Integer taskId;

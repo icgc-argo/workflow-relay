@@ -1,8 +1,5 @@
 package org.icgc_argo.workflow.relay.service;
 
-import static java.lang.String.format;
-import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +9,7 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
@@ -19,14 +17,19 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.icgc_argo.workflow.relay.config.elastic.ElasticsearchProperties;
 import org.icgc_argo.workflow.relay.config.stream.IndexStream;
-import org.icgc_argo.workflow.relay.entities.metadata.TaskEvent;
-import org.icgc_argo.workflow.relay.entities.metadata.WorkflowEvent;
-import org.icgc_argo.workflow.relay.util.DocumentConverter;
+import org.icgc_argo.workflow.relay.entities.index.WorkflowState;
+import org.icgc_argo.workflow.relay.entities.nextflow.TaskEvent;
+import org.icgc_argo.workflow.relay.entities.nextflow.WorkflowEvent;
+import org.icgc_argo.workflow.relay.util.NextflowDocumentConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+
+import static java.lang.String.format;
+import static java.lang.String.valueOf;
+import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
 
 @Profile("index")
 @Slf4j
@@ -58,35 +61,55 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.WORKFLOW)
   public void indexWorkflow(JsonNode event) {
+    // Convert nextflow workflow event to workflow index doc
     val workflowEvent = MAPPER.treeToValue(event, WorkflowEvent.class);
-
-    // convert metadata objects to index objects
-    val doc = DocumentConverter.buildWorkflowDocument(workflowEvent);
+    val doc = NextflowDocumentConverter.buildWorkflowDocument(workflowEvent);
 
     // serialize index objects to json
     val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
 
-    val runId = event.path("runId").asText();
-    val runName = event.path("runName").asText();
+    // Log and index
     log.info(
         format(
-            "Indexing workflow information for run with runName: { %s }, runId: { %s }",
-            runName, runId));
-    val request =
-        new UpdateRequest(workflowIndex, runName)
-            .upsert(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON)
-            .doc(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
-    esClient.update(request, RequestOptions.DEFAULT);
+            "Indexing workflow information for run with runId: { %s }, sessionId: { %s }",
+            doc.getRunId(), doc.getSessionId()));
+
+    // Check for existing document and do not update if already
+    // exists with state WorkflowState.COMPLETE
+    GetRequest getRequest = new GetRequest(workflowIndex, doc.getRunId());
+    val getResponse = esClient.get(getRequest, RequestOptions.DEFAULT);
+
+    if (getResponse.isExists()
+        && getResponse
+            .getSourceAsMap()
+            .get("state")
+            .toString()
+            .equals(valueOf(WorkflowState.COMPLETE))) {
+      log.info(
+          format(
+              "Skipping document upsert as workflow information for run with runId: { %s }, sessionId: { %s } already exists in index with state { %s }",
+              doc.getRunId(), doc.getSessionId(), valueOf(WorkflowState.COMPLETE)));
+    } else {
+      val request =
+          new UpdateRequest(workflowIndex, doc.getRunId())
+              .upsert(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON)
+              .doc(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
+      esClient.update(request, RequestOptions.DEFAULT);
+    }
   }
 
   @SneakyThrows
   @StreamListener(IndexStream.TASK)
   public void indexTask(JsonNode event) {
+    // Convert nextflow task event to task index doc
     val taskEvent = MAPPER.treeToValue(event, TaskEvent.class);
-    val doc = DocumentConverter.buildTaskDocument(taskEvent);
+    val doc = NextflowDocumentConverter.buildTaskDocument(taskEvent);
+
+    // serialize index objects to json
     val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
-    val id = event.path("runId").asText();
-    log.info("Indexing task information for run: {}", id);
+
+    // Log and index
+    log.info("Indexing task information for run: {}", doc.getRunId());
     val request = new IndexRequest(taskIndex);
     request.source(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
     esClient.index(request, RequestOptions.DEFAULT);
