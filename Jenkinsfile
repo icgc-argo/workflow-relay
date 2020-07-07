@@ -1,3 +1,6 @@
+def dockerHubRepo = "icgcargo/workflow-relay"
+def githubRepo = "icgc-argo/workflow-relay"
+def chartVersion = "0.2.0"
 def commit = "UNKNOWN"
 def version = "UNKNOWN"
 
@@ -71,13 +74,30 @@ spec:
                             }
 
                             // DNS error if --network is default
-                            sh "docker build --network=host . -t icgcargo/workflow-relay:edge -t icgcargo/workflow-relay:${version}-${commit}"
+                            sh "docker build --network=host . -t ${dockerHubRepo}:edge -t ${dockerHubRepo}:${version}-${commit}"
 
-                            sh "docker push icgcargo/workflow-relay:${version}-${commit}"
-                            sh "docker push icgcargo/workflow-relay:edge"
+                            sh "docker push ${dockerHubRepo}-relay:${version}-${commit}"
+                            sh "docker push ${dockerHubRepo}:edge"
                         }
                     }
                 }
+
+                stage('deploy to rdpc-collab-dev') {
+                    when {
+// Change branch to develop after successful testing
+                        branch "2020-07-07-add-jenkins-deploy-stage"
+                    }
+                    steps {
+                        build(job: "/provision/helm", parameters: [
+                            [$class: 'StringParameterValue', name: 'AP_RDPC_ENV', value: 'dev' ],
+                            [$class: 'StringParameterValue', name: 'AP_CHART_NAME', value: 'workflow-relay'],
+                            [$class: 'StringParameterValue', name: 'AP_RELEASE_NAME', value: 'relay'],
+                            [$class: 'StringParameterValue', name: 'AP_HELM_CHART_VERSION', value: "${chartVersion}"],
+                            [$class: 'StringParameterValue', name: 'AP_ARGS_LINE', value: "--set-string image.tag=${version}-${commit}" ]
+                        ])
+                    }
+                }
+
                 stage('Release & Tag') {
                     when {
                         branch "master"
@@ -86,7 +106,7 @@ spec:
                         container('docker') {
                             withCredentials([usernamePassword(credentialsId: 'argoGithub', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                                 sh "git tag ${version}"
-                              sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/icgc-argo/workflow-relay --tags"
+                              sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${gitHubRepo} --tags"
                             }
 
                             withCredentials([usernamePassword(credentialsId:'argoDockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
@@ -94,10 +114,10 @@ spec:
                             }
 
                             // DNS error if --network is default
-                            sh "docker build --network=host . -t icgcargo/workflow-relay:latest -t icgcargo/workflow-relay:${version}"
+                            sh "docker build --network=host . -t ${dockerHubRepo}:latest -t ${dockerHubRepo}:${version}"
 
-                            sh "docker push icgcargo/workflow-relay:${version}"
-                            sh "docker push icgcargo/workflow-relay:latest"
+                            sh "docker push ${dockerHubRepo}:${version}"
+                            sh "docker push ${dockerHubRepo}:latest"
                         }
                     }
                 }
