@@ -27,6 +27,8 @@ import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.util.stream.Stream;
+
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
@@ -75,20 +77,20 @@ public class IndexService {
             doc.getRunId(), doc.getSessionId()));
 
     // Check for existing document and do not update if already
-    // exists with state WorkflowState.COMPLETE
+    // exists with state WorkflowState.COMPLETE OR WorkflowState.EXECUTOR_ERROR
     GetRequest getRequest = new GetRequest(workflowIndex, doc.getRunId());
     val getResponse = esClient.get(getRequest, RequestOptions.DEFAULT);
 
     if (getResponse.isExists()
-        && getResponse
-            .getSourceAsMap()
-            .get("state")
-            .toString()
-            .equals(valueOf(WorkflowState.COMPLETE))) {
+        && Stream.of(valueOf(WorkflowState.COMPLETE), valueOf(WorkflowState.EXECUTOR_ERROR))
+            .anyMatch(getResponse.getSourceAsMap().get("state").toString()::equalsIgnoreCase)) {
       log.info(
           format(
-              "Skipping document upsert as workflow information for run with runId: { %s }, sessionId: { %s } already exists in index with state { %s }",
-              doc.getRunId(), doc.getSessionId(), valueOf(WorkflowState.COMPLETE)));
+              "Skipping document upsert: %s or %s state workflow information for run with runId: { %s }, sessionId: { %s }, already exists in index",
+              WorkflowState.COMPLETE,
+              WorkflowState.EXECUTOR_ERROR,
+              doc.getRunId(),
+              doc.getSessionId()));
     } else {
       val request =
           new UpdateRequest(workflowIndex, doc.getRunId())
