@@ -70,7 +70,7 @@ public class NextflowDocumentConverter {
     return TaskDocument.builder()
         .runId(taskEvent.getRunName())
         .sessionId(taskEvent.getRunId())
-        .taskId(trace.getTask_id())
+        .taskId(trace.getTaskId())
         .name(trace.getName())
         .process(trace.getProcess())
         .tag(trace.getTag())
@@ -87,6 +87,12 @@ public class NextflowDocumentConverter {
         .memory(trace.getMemory())
         .duration(trace.getDuration())
         .realtime(trace.getRealtime())
+        .rss(trace.getRss())
+        .peakRss(trace.getPeakRss())
+        .vmem(trace.getVmem())
+        .peakVmem(trace.getPeakVmem())
+        .readBytes(trace.getReadBytes())
+        .writeBytes(trace.getWriteBytes())
         .build();
   }
 }

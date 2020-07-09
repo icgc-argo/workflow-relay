@@ -87,13 +87,13 @@ public class TestDocumentConverter {
 
     assertEquals(taskEvent.getRunName(), doc.getRunId());
     assertEquals(taskEvent.getRunId(), doc.getSessionId());
-    assertEquals(trace.getTask_id(), doc.getTaskId());
+    assertEquals(trace.getTaskId(), doc.getTaskId());
     assertEquals(trace.getName(), doc.getName());
     assertEquals(trace.getProcess(), doc.getProcess());
     assertEquals(trace.getTag(), doc.getTag());
     assertEquals(trace.getContainer(), doc.getContainer());
     assertEquals(trace.getAttempt(), doc.getAttempt());
-    assertEquals(TaskState.QUEUED, doc.getState());
+    assertEquals(TaskState.COMPLETE, doc.getState());
     assertEquals(trace.getSubmit(), doc.getSubmitTime());
     assertEquals(trace.getStart(), doc.getStartTime());
     assertEquals(trace.getComplete(), doc.getCompleteTime());
@@ -102,6 +102,13 @@ public class TestDocumentConverter {
     assertEquals(trace.getWorkdir(), doc.getWorkdir());
     assertEquals(trace.getCpus(), doc.getCpus());
     assertEquals(trace.getMemory(), doc.getMemory());
+    assertEquals(trace.getMemory(), doc.getMemory());
+    assertEquals(trace.getRss(), doc.getRss());
+    assertEquals(trace.getPeakRss(), doc.getPeakRss());
+    assertEquals(trace.getVmem(), doc.getVmem());
+    assertEquals(trace.getPeakVmem(), doc.getPeakVmem());
+    assertEquals(trace.getReadBytes(), doc.getReadBytes());
+    assertEquals(trace.getWriteBytes(), doc.getWriteBytes());
     assertEquals(trace.getDuration(), doc.getDuration());
     assertEquals(trace.getRealtime(), doc.getRealtime());
   }
