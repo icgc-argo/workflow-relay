@@ -33,7 +33,7 @@
         "type": "boolean"
       },
       "duration": {
-        "type": "integer"
+        "type": "long"
       }
     }
   }
