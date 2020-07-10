@@ -50,5 +50,5 @@ public class Workflow {
   @NonNull private Boolean success;
 
   /** Workflow duration */
-  private Integer duration;
+  private Long duration;
 }

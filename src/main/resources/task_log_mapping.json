@@ -51,13 +51,31 @@
         "type": "integer"
       },
       "memory": {
-        "type": "integer"
+        "type": "long"
       },
       "duration": {
-        "type": "integer"
+        "type": "long"
       },
       "realtime": {
-        "type": "integer"
+        "type": "long"
+      },
+      "rss": {
+        "type": "long"
+      },
+      "peakRss": {
+        "type": "long"
+      },
+      "vmem": {
+        "type": "long"
+      },
+      "peakVmem": {
+        "type": "long"
+      },
+      "readBytes": {
+        "type": "long"
+      },
+      "writeBytes": {
+        "type": "long"
       }
     }
   }
