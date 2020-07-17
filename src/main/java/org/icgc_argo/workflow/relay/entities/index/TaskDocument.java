@@ -19,9 +19,8 @@
 package org.icgc_argo.workflow.relay.entities.index;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
-
 import java.time.Instant;
+import lombok.*;
 
 @Getter
 @Builder

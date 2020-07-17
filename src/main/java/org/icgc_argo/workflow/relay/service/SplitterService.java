@@ -18,6 +18,8 @@
 
 package org.icgc_argo.workflow.relay.service;
 
+import static java.lang.String.format;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import org.icgc_argo.workflow.relay.config.stream.SplitStream;
@@ -28,8 +30,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
-
-import static java.lang.String.format;
 
 @Profile("splitter")
 @Slf4j
@@ -50,11 +50,17 @@ public class SplitterService {
   public void split(JsonNode event) {
     if (event.has("trace")) {
       // NEXTFLOW TASK EVENT
-      log.debug(format("Processing task (Nextflow) event for runId: { %s }, runName: { %s }", event.path("runId").asText(), event.path("runName").asText()));
+      log.debug(
+          format(
+              "Processing task (Nextflow) event for runId: { %s }, runName: { %s }",
+              event.path("runId").asText(), event.path("runName").asText()));
       taskOutput.send(MessageBuilder.withPayload(event).build());
     } else if (!event.path("metadata").path("workflow").isMissingNode()) {
       // NEXTFLOW WORKFLOW EVENT
-      log.debug(format("Processing workflow (Nextflow) event for runId: { %s }, runName: { %s }", event.path("runId").asText(), event.path("runName").asText()));
+      log.debug(
+          format(
+              "Processing workflow (Nextflow) event for runId: { %s }, runName: { %s }",
+              event.path("runId").asText(), event.path("runName").asText()));
       workflowOutput.send(MessageBuilder.withPayload(event).build());
     } else {
       log.error("Unhandled event: {}", event.toString());

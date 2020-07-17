@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2020 The Ontario Institute for Cancer Research. All rights reserved
- *  
+ *
  * This program and the accompanying materials are made available under the terms of the GNU Affero General Public License v3.0.
  * You should have received a copy of the GNU Affero General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
- *  
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
@@ -17,6 +17,10 @@
  */
 
 package org.icgc_argo.workflow.relay.service;
+
+import static org.icgc_argo.workflow.relay.util.Fixture.loadJsonFixture;
+import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
+import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,10 +37,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.icgc_argo.workflow.relay.util.Fixture.loadJsonFixture;
-import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
-import static org.junit.Assert.assertEquals;
-
 @Slf4j
 @RunWith(SpringRunner.class)
 public class TestDocumentConverter {
@@ -52,7 +52,8 @@ public class TestDocumentConverter {
   @Test
   public void testConvertWorkflowJson() {
     val workflowEvent =
-        loadJsonFixture(this.getClass(), "nextflow_workflow_event.json", WorkflowEvent.class, MAPPER);
+        loadJsonFixture(
+            this.getClass(), "nextflow_workflow_event.json", WorkflowEvent.class, MAPPER);
 
     val expected = workflowEvent.getMetadata().getWorkflow();
     val doc = NextflowDocumentConverter.buildWorkflowDocument(workflowEvent);
@@ -76,7 +77,8 @@ public class TestDocumentConverter {
   @Test
   public void testConvertWorkflowJsonWithError() {
     val workflowEvent =
-        loadJsonFixture(this.getClass(), "nextflow_workflow_event_error.json", WorkflowEvent.class, MAPPER);
+        loadJsonFixture(
+            this.getClass(), "nextflow_workflow_event_error.json", WorkflowEvent.class, MAPPER);
 
     val expected = workflowEvent.getMetadata().getWorkflow();
     val doc = NextflowDocumentConverter.buildWorkflowDocument(workflowEvent);
@@ -99,7 +101,8 @@ public class TestDocumentConverter {
 
   @Test
   public void testLoadTaskJson() {
-    val taskEvent = loadJsonFixture(this.getClass(), "nextflow_task_event.json", TaskEvent.class, MAPPER);
+    val taskEvent =
+        loadJsonFixture(this.getClass(), "nextflow_task_event.json", TaskEvent.class, MAPPER);
     val trace = taskEvent.getTrace();
     val doc = NextflowDocumentConverter.buildTaskDocument(taskEvent);
 

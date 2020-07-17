@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2020 The Ontario Institute for Cancer Research. All rights reserved
- *  
+ *
  * This program and the accompanying materials are made available under the terms of the GNU Affero General Public License v3.0.
  * You should have received a copy of the GNU Affero General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
- *  
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
@@ -35,7 +35,8 @@ public class SanitizeTest {
     // ftp://ftp-private.ebi.ac.uk/upload/foivos/test.txt should be hashed to
     // 84b70f172cb4506996c77108036f068f
 
-    val resource = this.getClass().getClassLoader().getResource("fixtures/nextflow_workflow_event.json");
+    val resource =
+        this.getClass().getClassLoader().getResource("fixtures/nextflow_workflow_event.json");
     assert resource != null;
     val content = Files.readString(Path.of(resource.toURI()));
 
@@ -51,7 +52,8 @@ public class SanitizeTest {
   @Test
   @SneakyThrows
   public void testSanitizeInteger() {
-    val resource = this.getClass().getClassLoader().getResource("fixtures/nextflow_workflow_event.json");
+    val resource =
+        this.getClass().getClassLoader().getResource("fixtures/nextflow_workflow_event.json");
     assert resource != null;
     val content = Files.readString(Path.of(resource.toURI()));
 
@@ -67,7 +69,8 @@ public class SanitizeTest {
   @Test
   @SneakyThrows
   public void testSanitizeNumber() {
-    val resource = this.getClass().getClassLoader().getResource("fixtures/nextflow_workflow_event.json");
+    val resource =
+        this.getClass().getClassLoader().getResource("fixtures/nextflow_workflow_event.json");
     assert resource != null;
     val content = Files.readString(Path.of(resource.toURI()));
 
