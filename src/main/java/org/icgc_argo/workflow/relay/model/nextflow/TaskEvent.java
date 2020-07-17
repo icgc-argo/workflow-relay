@@ -16,21 +16,25 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.icgc_argo.workflow.relay.entities.index;
+package org.icgc_argo.workflow.relay.model.nextflow;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
-@Data
+@Getter
 @Builder
-@AllArgsConstructor
+@ToString
 @NoArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class EngineParameters {
-  String launchDir;
-  String projectDir;
-  String workDir;
-  String revision;
-  String resume;
+@AllArgsConstructor
+@EqualsAndHashCode
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class TaskEvent {
+
+  @NonNull private Trace trace;
+
+  /** Workflow run ID */
+  @NonNull private String runId;
+
+  /** Workflow run name */
+  @NonNull private String runName;
 }

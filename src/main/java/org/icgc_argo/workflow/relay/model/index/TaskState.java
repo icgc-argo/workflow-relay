@@ -16,25 +16,39 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.icgc_argo.workflow.relay.entities.nextflow;
+package org.icgc_argo.workflow.relay.model.index;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-@Getter
-@Builder
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class TaskEvent {
+@RequiredArgsConstructor
+public enum TaskState {
+  RUNNING("RUNNING"),
 
-  @NonNull private Trace trace;
+  COMPLETE("COMPLETE"),
 
-  /** Workflow run ID */
-  @NonNull private String runId;
+  QUEUED("QUEUED"),
 
-  /** Workflow run name */
-  @NonNull private String runName;
+  UNKNOWN("UNKNOWN"),
+
+  EXECUTOR_ERROR("EXECUTOR_ERROR");
+
+  @NonNull private final String value;
+
+  public static TaskState fromValue(@NonNull String text) {
+    if (text.equalsIgnoreCase("RUNNING")) {
+      return TaskState.RUNNING;
+    } else if (text.equalsIgnoreCase("SUBMITTED")) {
+      return TaskState.QUEUED;
+    } else if (text.equalsIgnoreCase("COMPLETED")) {
+      return TaskState.COMPLETE;
+    } else if (text.equalsIgnoreCase("FAILED")) {
+      return TaskState.EXECUTOR_ERROR;
+    } else return TaskState.UNKNOWN;
+  }
+
+  @Override
+  public String toString() {
+    return value;
+  }
 }
