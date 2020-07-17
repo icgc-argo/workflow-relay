@@ -23,13 +23,13 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum WorkflowState {
+  UNKNOWN("UNKNOWN"),
+
   RUNNING("RUNNING"),
 
   COMPLETE("COMPLETE"),
 
-  EXECUTOR_ERROR("EXECUTOR_ERROR"),
-
-  UNKNOWN("UNKNOWN");
+  EXECUTOR_ERROR("EXECUTOR_ERROR");
 
   @NonNull private final String value;
 

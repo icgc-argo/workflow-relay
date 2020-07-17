@@ -23,13 +23,13 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum TaskState {
-  RUNNING("RUNNING"),
-
-  COMPLETE("COMPLETE"),
-
   QUEUED("QUEUED"),
 
   UNKNOWN("UNKNOWN"),
+
+  RUNNING("RUNNING"),
+
+  COMPLETE("COMPLETE"),
 
   EXECUTOR_ERROR("EXECUTOR_ERROR");
 
