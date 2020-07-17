@@ -16,20 +16,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.icgc_argo.workflow.relay.entities.index;
+package org.icgc_argo.workflow.relay.model.index;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum WorkflowState {
+  UNKNOWN("UNKNOWN"),
+
   RUNNING("RUNNING"),
 
   COMPLETE("COMPLETE"),
 
-  EXECUTOR_ERROR("EXECUTOR_ERROR"),
-
-  UNKNOWN("UNKNOWN");
+  EXECUTOR_ERROR("EXECUTOR_ERROR");
 
   @NonNull private final String value;
 

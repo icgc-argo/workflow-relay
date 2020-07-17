@@ -20,6 +20,7 @@ package org.icgc_argo.workflow.relay.service;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
+import static org.icgc_argo.workflow.relay.model.index.TaskState.isNextState;
 import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -27,22 +28,32 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
+import lombok.Data;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.icgc_argo.workflow.relay.config.elastic.ElasticsearchProperties;
 import org.icgc_argo.workflow.relay.config.stream.IndexStream;
-import org.icgc_argo.workflow.relay.entities.index.WorkflowState;
-import org.icgc_argo.workflow.relay.entities.nextflow.TaskEvent;
-import org.icgc_argo.workflow.relay.entities.nextflow.WorkflowEvent;
+import org.icgc_argo.workflow.relay.model.index.TaskDocument;
+import org.icgc_argo.workflow.relay.model.index.TaskState;
+import org.icgc_argo.workflow.relay.model.index.WorkflowState;
+import org.icgc_argo.workflow.relay.model.nextflow.TaskEvent;
+import org.icgc_argo.workflow.relay.model.nextflow.WorkflowEvent;
 import org.icgc_argo.workflow.relay.util.NextflowDocumentConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -126,11 +137,83 @@ public class IndexService {
 
     // serialize index objects to json
     val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
+    log.info("Indexing task information for task: {}, in run: {}", doc.getTaskId(), doc.getRunId());
 
-    // Log and index
-    log.info("Indexing task information for run: {}", doc.getRunId());
+    // Cannot upsert exclusively via elasticsearch as document _id is not known ahead of time
+    val existingTaskOpt = checkForExistingTask(doc.getRunId(), doc.getTaskId());
+    val taskConsumer = getExistingTaskConsumer(doc, jsonNode);
+    existingTaskOpt.ifPresentOrElse(taskConsumer, () -> handleNewTask(doc, jsonNode));
+  }
+
+  private Optional<TaskTuple> checkForExistingTask(@NonNull String runId, @NonNull Integer taskId)
+      throws IOException {
+    // Check for existing document and determine if update is needed
+    val bq = new BoolQueryBuilder();
+    bq.must(new TermQueryBuilder("runId", runId));
+    bq.must(new TermQueryBuilder("taskId", taskId));
+    val searchRequest =
+        new SearchRequest(taskIndex).source(SearchSourceBuilder.searchSource().query(bq));
+
+    // Execute search and verify number of hits is either 0 or 1. Otherwise Throw illegal state.
+    val searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
+    val hits = searchResponse.getHits();
+    if (hits.getTotalHits().value == 0L) {
+      return Optional.empty();
+    } else if (hits.getTotalHits().value > 1L) {
+      throw new IllegalStateException(
+          format("Incorrect number of tasks. Expected 1 or 0, got %d", hits.getTotalHits().value));
+    }
+
+    val hit = hits.getHits()[0];
+    val docId = hit.getId();
+
+    // Guard against a strange mapping
+    val stateObject = hit.getSourceAsMap().get("state");
+    if (!(stateObject instanceof String)) {
+      throw new IllegalStateException(
+          format("Task state is not a string for _id: %s, check index mapping", docId));
+    }
+    val state = TaskState.fromValue((String) stateObject);
+
+    return Optional.of(new TaskTuple(docId, state));
+  }
+
+  private Consumer<TaskTuple> getExistingTaskConsumer(
+      @NonNull TaskDocument doc, @NonNull JsonNode jsonNode) {
+    return taskTuple -> {
+      if (isNextState(taskTuple.getState(), doc.getState())) {
+        log.trace(
+            "Task {} in Run {} to be updated from {} to {}",
+            doc.getTaskId(),
+            doc.getRunId(),
+            taskTuple.getState(),
+            doc.getState());
+        try {
+          val request =
+              new UpdateRequest(workflowIndex, taskTuple.getId())
+                  .doc(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
+          esClient.update(request, RequestOptions.DEFAULT);
+        } catch (IOException io) {
+          throw new RuntimeException(io);
+        }
+      }
+    };
+  }
+
+  private void handleNewTask(@NonNull TaskDocument doc, @NonNull JsonNode jsonNode) {
+    log.trace("New Task {} indexed for Run {}", doc.getTaskId(), doc.getRunId());
     val request = new IndexRequest(taskIndex);
-    request.source(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
-    esClient.index(request, RequestOptions.DEFAULT);
+    try {
+      request.source(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
+      esClient.index(request, RequestOptions.DEFAULT);
+    } catch (IOException io) {
+      throw new RuntimeException(io);
+    }
+  }
+
+  @Data
+  private static class TaskTuple {
+    private final String id;
+    private final TaskState state;
   }
 }

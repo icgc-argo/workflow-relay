@@ -16,20 +16,20 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.icgc_argo.workflow.relay.entities.index;
+package org.icgc_argo.workflow.relay.model.index;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum TaskState {
-  RUNNING("RUNNING"),
-
-  COMPLETE("COMPLETE"),
+  UNKNOWN("UNKNOWN"),
 
   QUEUED("QUEUED"),
 
-  UNKNOWN("UNKNOWN"),
+  RUNNING("RUNNING"),
+
+  COMPLETE("COMPLETE"),
 
   EXECUTOR_ERROR("EXECUTOR_ERROR");
 
@@ -50,5 +50,16 @@ public enum TaskState {
   @Override
   public String toString() {
     return value;
+  }
+
+  /**
+   * Compares enums to determine if the next state follows the current state
+   *
+   * @param current The current state
+   * @param next The candidate next state
+   * @return return true if next follows current
+   */
+  public static boolean isNextState(@NonNull TaskState current, @NonNull TaskState next) {
+    return current.compareTo(next) < 0;
   }
 }

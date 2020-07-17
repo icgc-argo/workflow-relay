@@ -25,9 +25,9 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.icgc_argo.workflow.relay.entities.index.*;
-import org.icgc_argo.workflow.relay.entities.nextflow.TaskEvent;
-import org.icgc_argo.workflow.relay.entities.nextflow.WorkflowEvent;
+import org.icgc_argo.workflow.relay.model.index.*;
+import org.icgc_argo.workflow.relay.model.nextflow.TaskEvent;
+import org.icgc_argo.workflow.relay.model.nextflow.WorkflowEvent;
 
 /** Utility class that converts metadata POJOs to index POJOs. */
 @Slf4j

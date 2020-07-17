@@ -16,28 +16,42 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.icgc_argo.workflow.relay.entities.nextflow;
+package org.icgc_argo.workflow.relay.model.index;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import static org.icgc_argo.workflow.relay.model.index.TaskState.isNextState;
+import static org.junit.Assert.*;
 
-@Getter
-@Builder
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class WorkflowEvent {
+import org.junit.Test;
 
-  /** workflow run ID */
-  @NonNull private String runId;
+/**
+ * While all this is just testing is the static method wrapping a compareTo call, the real intention
+ * is that it tests whether or not someone is mucking with the ordering of the enum declarations.
+ */
+public class TaskStateTest {
 
-  /** workflow run name */
-  @NonNull private String runName;
+  @Test
+  public void testIsNextStateUnknownQueued_true() {
+    assertTrue(isNextState(TaskState.UNKNOWN, TaskState.QUEUED));
+  }
 
-  /** The overall state of the workflow run, mapped to WorkflowDocument's WorkflowState */
-  @NonNull private String event;
+  @Test
+  public void testIsNextStateCompletedQueued_false() {
+    assertFalse(isNextState(TaskState.COMPLETE, TaskState.QUEUED));
+  }
 
-  @NonNull private Metadata metadata;
+  @Test
+  public void testIsNextStateQueuedCompleted_true() {
+    assertTrue(isNextState(TaskState.QUEUED, TaskState.COMPLETE));
+  }
+
+  @Test
+  public void testIsNextStateExecutorErrorCompleted_false() {
+    assertFalse(isNextState(TaskState.EXECUTOR_ERROR, TaskState.COMPLETE));
+  }
+
+  /** This should never happen, but test anyways */
+  @Test
+  public void testIsNextStateCompletedCompleted_false() {
+    assertFalse(isNextState(TaskState.COMPLETE, TaskState.COMPLETE));
+  }
 }
