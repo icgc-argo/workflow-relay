@@ -135,14 +135,12 @@ public class IndexService {
     val taskEvent = MAPPER.treeToValue(event, TaskEvent.class);
     val doc = NextflowDocumentConverter.buildTaskDocument(taskEvent);
 
-    // serialize index objects to json
-    val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
     log.info("Indexing task information for task: {}, in run: {}", doc.getTaskId(), doc.getRunId());
 
     // Cannot upsert exclusively via elasticsearch as document _id is not known ahead of time
     val existingTaskOpt = checkForExistingTask(doc.getRunId(), doc.getTaskId());
-    val taskConsumer = getExistingTaskConsumer(doc, jsonNode);
-    existingTaskOpt.ifPresentOrElse(taskConsumer, () -> handleNewTask(doc, jsonNode));
+    val taskConsumer = getExistingTaskConsumer(doc);
+    existingTaskOpt.ifPresentOrElse(taskConsumer, () -> handleNewTask(doc));
   }
 
   private Optional<TaskTuple> checkForExistingTask(@NonNull String runId, @NonNull Integer taskId)
@@ -178,8 +176,14 @@ public class IndexService {
     return Optional.of(new TaskTuple(docId, state));
   }
 
+  /**
+   * Create a consumer for handling whether or not to update a new Task document and handle the indexing.
+   * Wraps an IOException in a RuntimeException
+   * @param doc The new Task Document to be indexed
+   * @return A consumer that takes the existing Task information in the form of a taskTuple
+   */
   private Consumer<TaskTuple> getExistingTaskConsumer(
-      @NonNull TaskDocument doc, @NonNull JsonNode jsonNode) {
+      @NonNull TaskDocument doc) {
     return taskTuple -> {
       if (isNextState(taskTuple.getState(), doc.getState())) {
         log.trace(
@@ -189,8 +193,9 @@ public class IndexService {
             taskTuple.getState(),
             doc.getState());
         try {
+          val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
           val request =
-              new UpdateRequest(workflowIndex, taskTuple.getId())
+              new UpdateRequest(taskIndex, taskTuple.getId())
                   .doc(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
           esClient.update(request, RequestOptions.DEFAULT);
         } catch (IOException io) {
@@ -200,15 +205,19 @@ public class IndexService {
     };
   }
 
-  private void handleNewTask(@NonNull TaskDocument doc, @NonNull JsonNode jsonNode) {
+  /**
+   * Index a new task wrapping a possible IOException as a RuntimeException
+   * @param doc The TaskDocument being indexed
+   */
+  @SneakyThrows
+  private void handleNewTask(@NonNull TaskDocument doc) {
     log.trace("New Task {} indexed for Run {}", doc.getTaskId(), doc.getRunId());
+
+    // serialize index objects to json
+    val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
     val request = new IndexRequest(taskIndex);
-    try {
       request.source(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
       esClient.index(request, RequestOptions.DEFAULT);
-    } catch (IOException io) {
-      throw new RuntimeException(io);
-    }
   }
 
   @Data
