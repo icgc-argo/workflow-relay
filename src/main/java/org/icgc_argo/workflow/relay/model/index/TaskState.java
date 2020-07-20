@@ -16,25 +16,39 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.icgc_argo.workflow.relay.config.stream;
+package org.icgc_argo.workflow.relay.model.index;
 
-import org.springframework.cloud.stream.annotation.Input;
-import org.springframework.cloud.stream.annotation.Output;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.SubscribableChannel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-public interface SplitStream {
+@RequiredArgsConstructor
+public enum TaskState {
+  QUEUED("QUEUED"),
 
-  String WEBLOG = "weblogout";
-  String WORKFLOW = "workflow";
-  String TASK = "task";
+  UNKNOWN("UNKNOWN"),
 
-  @Input(WEBLOG)
-  SubscribableChannel webLogOutInput();
+  RUNNING("RUNNING"),
 
-  @Output(WORKFLOW)
-  MessageChannel workflowOutput();
+  COMPLETE("COMPLETE"),
 
-  @Output(TASK)
-  MessageChannel taskOutput();
+  EXECUTOR_ERROR("EXECUTOR_ERROR");
+
+  @NonNull private final String value;
+
+  public static TaskState fromValue(@NonNull String text) {
+    if (text.equalsIgnoreCase("RUNNING")) {
+      return TaskState.RUNNING;
+    } else if (text.equalsIgnoreCase("SUBMITTED")) {
+      return TaskState.QUEUED;
+    } else if (text.equalsIgnoreCase("COMPLETED")) {
+      return TaskState.COMPLETE;
+    } else if (text.equalsIgnoreCase("FAILED")) {
+      return TaskState.EXECUTOR_ERROR;
+    } else return TaskState.UNKNOWN;
+  }
+
+  @Override
+  public String toString() {
+    return value;
+  }
 }

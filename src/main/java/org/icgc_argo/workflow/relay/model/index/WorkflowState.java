@@ -16,25 +16,35 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.icgc_argo.workflow.relay.config.stream;
+package org.icgc_argo.workflow.relay.model.index;
 
-import org.springframework.cloud.stream.annotation.Input;
-import org.springframework.cloud.stream.annotation.Output;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.SubscribableChannel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-public interface SplitStream {
+@RequiredArgsConstructor
+public enum WorkflowState {
+  UNKNOWN("UNKNOWN"),
 
-  String WEBLOG = "weblogout";
-  String WORKFLOW = "workflow";
-  String TASK = "task";
+  RUNNING("RUNNING"),
 
-  @Input(WEBLOG)
-  SubscribableChannel webLogOutInput();
+  COMPLETE("COMPLETE"),
 
-  @Output(WORKFLOW)
-  MessageChannel workflowOutput();
+  EXECUTOR_ERROR("EXECUTOR_ERROR");
 
-  @Output(TASK)
-  MessageChannel taskOutput();
+  @NonNull private final String value;
+
+  public static WorkflowState fromValueAndSuccess(@NonNull String text, @NonNull boolean success) {
+    if (text.equalsIgnoreCase("started")) {
+      return WorkflowState.RUNNING;
+    } else if (text.equalsIgnoreCase("completed") && success) {
+      return WorkflowState.COMPLETE;
+    } else if (text.equalsIgnoreCase("completed") && !success) {
+      return WorkflowState.EXECUTOR_ERROR;
+    } else return WorkflowState.UNKNOWN;
+  }
+
+  @Override
+  public String toString() {
+    return value;
+  }
 }

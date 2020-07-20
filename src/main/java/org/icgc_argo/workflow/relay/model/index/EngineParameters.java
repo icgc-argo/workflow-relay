@@ -16,25 +16,21 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.icgc_argo.workflow.relay.config.stream;
+package org.icgc_argo.workflow.relay.model.index;
 
-import org.springframework.cloud.stream.annotation.Input;
-import org.springframework.cloud.stream.annotation.Output;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.SubscribableChannel;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.*;
 
-public interface SplitStream {
-
-  String WEBLOG = "weblogout";
-  String WORKFLOW = "workflow";
-  String TASK = "task";
-
-  @Input(WEBLOG)
-  SubscribableChannel webLogOutInput();
-
-  @Output(WORKFLOW)
-  MessageChannel workflowOutput();
-
-  @Output(TASK)
-  MessageChannel taskOutput();
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+public class EngineParameters {
+  String launchDir;
+  String projectDir;
+  String workDir;
+  String revision;
+  String resume;
 }

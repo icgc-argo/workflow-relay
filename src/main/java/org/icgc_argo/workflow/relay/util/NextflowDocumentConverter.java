@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2020 The Ontario Institute for Cancer Research. All rights reserved
+ *
+ * This program and the accompanying materials are made available under the terms of the GNU Affero General Public License v3.0.
+ * You should have received a copy of the GNU Affero General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.icgc_argo.workflow.relay.util;
 
 import static org.icgc_argo.workflow.relay.exceptions.NotFoundException.checkNotFound;
@@ -7,9 +25,9 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.icgc_argo.workflow.relay.entities.index.*;
-import org.icgc_argo.workflow.relay.entities.nextflow.TaskEvent;
-import org.icgc_argo.workflow.relay.entities.nextflow.WorkflowEvent;
+import org.icgc_argo.workflow.relay.model.index.*;
+import org.icgc_argo.workflow.relay.model.nextflow.TaskEvent;
+import org.icgc_argo.workflow.relay.model.nextflow.WorkflowEvent;
 
 /** Utility class that converts metadata POJOs to index POJOs. */
 @Slf4j
@@ -70,7 +88,7 @@ public class NextflowDocumentConverter {
     return TaskDocument.builder()
         .runId(taskEvent.getRunName())
         .sessionId(taskEvent.getRunId())
-        .taskId(trace.getTask_id())
+        .taskId(trace.getTaskId())
         .name(trace.getName())
         .process(trace.getProcess())
         .tag(trace.getTag())
@@ -87,6 +105,12 @@ public class NextflowDocumentConverter {
         .memory(trace.getMemory())
         .duration(trace.getDuration())
         .realtime(trace.getRealtime())
+        .rss(trace.getRss())
+        .peakRss(trace.getPeakRss())
+        .vmem(trace.getVmem())
+        .peakVmem(trace.getPeakVmem())
+        .readBytes(trace.getReadBytes())
+        .writeBytes(trace.getWriteBytes())
         .build();
   }
 }

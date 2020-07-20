@@ -1,4 +1,26 @@
+/*
+ * Copyright (c) 2020 The Ontario Institute for Cancer Research. All rights reserved
+ *
+ * This program and the accompanying materials are made available under the terms of the GNU Affero General Public License v3.0.
+ * You should have received a copy of the GNU Affero General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 package org.icgc_argo.workflow.relay.service;
+
+import static org.icgc_argo.workflow.relay.util.Fixture.loadJsonFixture;
+import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
+import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,18 +28,14 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.icgc_argo.workflow.relay.entities.index.TaskState;
-import org.icgc_argo.workflow.relay.entities.index.WorkflowState;
-import org.icgc_argo.workflow.relay.entities.nextflow.TaskEvent;
-import org.icgc_argo.workflow.relay.entities.nextflow.WorkflowEvent;
+import org.icgc_argo.workflow.relay.model.index.TaskState;
+import org.icgc_argo.workflow.relay.model.index.WorkflowState;
+import org.icgc_argo.workflow.relay.model.nextflow.TaskEvent;
+import org.icgc_argo.workflow.relay.model.nextflow.WorkflowEvent;
 import org.icgc_argo.workflow.relay.util.NextflowDocumentConverter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import static org.icgc_argo.workflow.relay.util.Fixture.loadJsonFixture;
-import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
-import static org.junit.Assert.assertEquals;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -34,7 +52,8 @@ public class TestDocumentConverter {
   @Test
   public void testConvertWorkflowJson() {
     val workflowEvent =
-        loadJsonFixture(this.getClass(), "nextflow_workflow_event.json", WorkflowEvent.class, MAPPER);
+        loadJsonFixture(
+            this.getClass(), "nextflow_workflow_event.json", WorkflowEvent.class, MAPPER);
 
     val expected = workflowEvent.getMetadata().getWorkflow();
     val doc = NextflowDocumentConverter.buildWorkflowDocument(workflowEvent);
@@ -58,7 +77,8 @@ public class TestDocumentConverter {
   @Test
   public void testConvertWorkflowJsonWithError() {
     val workflowEvent =
-        loadJsonFixture(this.getClass(), "nextflow_workflow_event_error.json", WorkflowEvent.class, MAPPER);
+        loadJsonFixture(
+            this.getClass(), "nextflow_workflow_event_error.json", WorkflowEvent.class, MAPPER);
 
     val expected = workflowEvent.getMetadata().getWorkflow();
     val doc = NextflowDocumentConverter.buildWorkflowDocument(workflowEvent);
@@ -81,19 +101,20 @@ public class TestDocumentConverter {
 
   @Test
   public void testLoadTaskJson() {
-    val taskEvent = loadJsonFixture(this.getClass(), "nextflow_task_event.json", TaskEvent.class, MAPPER);
+    val taskEvent =
+        loadJsonFixture(this.getClass(), "nextflow_task_event.json", TaskEvent.class, MAPPER);
     val trace = taskEvent.getTrace();
     val doc = NextflowDocumentConverter.buildTaskDocument(taskEvent);
 
     assertEquals(taskEvent.getRunName(), doc.getRunId());
     assertEquals(taskEvent.getRunId(), doc.getSessionId());
-    assertEquals(trace.getTask_id(), doc.getTaskId());
+    assertEquals(trace.getTaskId(), doc.getTaskId());
     assertEquals(trace.getName(), doc.getName());
     assertEquals(trace.getProcess(), doc.getProcess());
     assertEquals(trace.getTag(), doc.getTag());
     assertEquals(trace.getContainer(), doc.getContainer());
     assertEquals(trace.getAttempt(), doc.getAttempt());
-    assertEquals(TaskState.QUEUED, doc.getState());
+    assertEquals(TaskState.COMPLETE, doc.getState());
     assertEquals(trace.getSubmit(), doc.getSubmitTime());
     assertEquals(trace.getStart(), doc.getStartTime());
     assertEquals(trace.getComplete(), doc.getCompleteTime());
@@ -102,6 +123,13 @@ public class TestDocumentConverter {
     assertEquals(trace.getWorkdir(), doc.getWorkdir());
     assertEquals(trace.getCpus(), doc.getCpus());
     assertEquals(trace.getMemory(), doc.getMemory());
+    assertEquals(trace.getMemory(), doc.getMemory());
+    assertEquals(trace.getRss(), doc.getRss());
+    assertEquals(trace.getPeakRss(), doc.getPeakRss());
+    assertEquals(trace.getVmem(), doc.getVmem());
+    assertEquals(trace.getPeakVmem(), doc.getPeakVmem());
+    assertEquals(trace.getReadBytes(), doc.getReadBytes());
+    assertEquals(trace.getWriteBytes(), doc.getWriteBytes());
     assertEquals(trace.getDuration(), doc.getDuration());
     assertEquals(trace.getRealtime(), doc.getRealtime());
   }

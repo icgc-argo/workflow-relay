@@ -16,25 +16,28 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.icgc_argo.workflow.relay.config.stream;
+package org.icgc_argo.workflow.relay.model.nextflow;
 
-import org.springframework.cloud.stream.annotation.Input;
-import org.springframework.cloud.stream.annotation.Output;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.SubscribableChannel;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 
-public interface SplitStream {
+@Getter
+@Builder
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class WorkflowEvent {
 
-  String WEBLOG = "weblogout";
-  String WORKFLOW = "workflow";
-  String TASK = "task";
+  /** workflow run ID */
+  @NonNull private String runId;
 
-  @Input(WEBLOG)
-  SubscribableChannel webLogOutInput();
+  /** workflow run name */
+  @NonNull private String runName;
 
-  @Output(WORKFLOW)
-  MessageChannel workflowOutput();
+  /** The overall state of the workflow run, mapped to WorkflowDocument's WorkflowState */
+  @NonNull private String event;
 
-  @Output(TASK)
-  MessageChannel taskOutput();
+  @NonNull private Metadata metadata;
 }
