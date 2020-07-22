@@ -28,6 +28,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,7 +76,10 @@ public class ElasticsearchStartupListener implements ApplicationListener<Context
     val request = new GetIndexRequest(indexName);
     if (!client.indices().exists(request, RequestOptions.DEFAULT)) {
       val indexSource = loadIndexSourceAsString(indexName);
-      val createRequest = new CreateIndexRequest(indexName);
+      val createRequest = new CreateIndexRequest(indexName).settings(Settings.builder()
+          .put("index.number_of_shards", properties.numberOfShards)
+          .put("index.number_of_replicas", properties.numberOfReplicas)
+      );
       log.info("Creating index {}", indexName);
       createRequest.source(indexSource, XContentType.JSON);
       val response = client.indices().create(createRequest, RequestOptions.DEFAULT);

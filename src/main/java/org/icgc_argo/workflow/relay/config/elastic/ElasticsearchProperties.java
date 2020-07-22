@@ -37,4 +37,6 @@ public class ElasticsearchProperties {
   Boolean useAuthentication;
   String workflowIndex;
   String taskIndex;
+  Integer numberOfShards;
+  Integer numberOfReplicas;
 }

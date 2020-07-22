@@ -75,6 +75,8 @@ elastic:
   password: testing
   workflowIndex: workflow
   taskIndex: task
+  numberOfShards: 3
+  numberOfReplicas: 2
 
 sanitize:
   paths:
