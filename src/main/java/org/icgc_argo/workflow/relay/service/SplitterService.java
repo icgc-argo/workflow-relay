@@ -60,6 +60,10 @@ public class SplitterService {
               "Processing task (Nextflow) event for runId: { %s }, runName: { %s }",
               runId, runName));
       taskOutput.send(
+          // TODO: https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
+          // Before enabling compaction we need to ensure that we are passing our event UTC time to
+          // some yet to be developed custom header for compaction to use to determine order otherwise
+          // order is not guaranteed and we could lose information
           MessageBuilder.withPayload(event)
               .setHeader(
                   KafkaHeaders.MESSAGE_KEY, String.format("%s-%s", runName, taskId).getBytes())
@@ -73,6 +77,8 @@ public class SplitterService {
               "Processing workflow (Nextflow) event for runId: { %s }, runName: { %s }",
               runId, runName));
       workflowOutput.send(
+          // TODO: https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
+          // See above message
           MessageBuilder.withPayload(event)
               .setHeader(KafkaHeaders.MESSAGE_KEY, runName.getBytes())
               .build());
