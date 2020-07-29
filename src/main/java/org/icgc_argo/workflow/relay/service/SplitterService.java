@@ -66,7 +66,8 @@ public class SplitterService {
           // order is not guaranteed and we could lose information
           MessageBuilder.withPayload(event)
               .setHeader(
-                  KafkaHeaders.MESSAGE_KEY, String.format("%s-%s", runName, taskId).getBytes())
+                  // task key example: wes-1234567890abcdefg-t3
+                  KafkaHeaders.MESSAGE_KEY, String.format("%s-t%s", runName, taskId).getBytes())
               .build());
     } else if (!event.path("metadata").path("workflow").isMissingNode()) {
       // NEXTFLOW WORKFLOW EVENT
@@ -80,6 +81,7 @@ public class SplitterService {
           // TODO: https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
           // See above message
           MessageBuilder.withPayload(event)
+              // workflow topic key == nextflow runName (our wes id ... e.g. wes-1234567890abcdefg)
               .setHeader(KafkaHeaders.MESSAGE_KEY, runName.getBytes())
               .build());
     } else {
