@@ -18,18 +18,20 @@
 
 package org.icgc_argo.workflow.relay.service;
 
-import static java.lang.String.format;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.icgc_argo.workflow.relay.config.stream.SplitStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.context.annotation.Profile;
+import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
+
+import static java.lang.String.format;
 
 @Profile("splitter")
 @Slf4j
@@ -50,18 +52,38 @@ public class SplitterService {
   public void split(JsonNode event) {
     if (event.has("trace")) {
       // NEXTFLOW TASK EVENT
+      val runId = event.path("runId").asText();
+      val runName = event.path("runName").asText();
+      val taskId = event.path("trace").path("task_id").asText();
       log.debug(
           format(
               "Processing task (Nextflow) event for runId: { %s }, runName: { %s }",
-              event.path("runId").asText(), event.path("runName").asText()));
-      taskOutput.send(MessageBuilder.withPayload(event).build());
+              runId, runName));
+      taskOutput.send(
+          // TODO: https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
+          // Before enabling compaction we need to ensure that we are passing our event UTC time to
+          // some yet to be developed custom header for compaction to use to determine order otherwise
+          // order is not guaranteed and we could lose information
+          MessageBuilder.withPayload(event)
+              .setHeader(
+                  // task key example: wes-1234567890abcdefg-t3
+                  KafkaHeaders.MESSAGE_KEY, String.format("%s-t%s", runName, taskId).getBytes())
+              .build());
     } else if (!event.path("metadata").path("workflow").isMissingNode()) {
       // NEXTFLOW WORKFLOW EVENT
+      val runId = event.path("runId").asText();
+      val runName = event.path("runName").asText();
       log.debug(
           format(
               "Processing workflow (Nextflow) event for runId: { %s }, runName: { %s }",
-              event.path("runId").asText(), event.path("runName").asText()));
-      workflowOutput.send(MessageBuilder.withPayload(event).build());
+              runId, runName));
+      workflowOutput.send(
+          // TODO: https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
+          // See above message
+          MessageBuilder.withPayload(event)
+              // workflow topic key == nextflow runName (our wes id ... e.g. wes-1234567890abcdefg)
+              .setHeader(KafkaHeaders.MESSAGE_KEY, runName.getBytes())
+              .build());
     } else {
       log.error("Unhandled event: {}", event.toString());
       throw new RuntimeException("Cannot handle event, please see DLQ for event information");
