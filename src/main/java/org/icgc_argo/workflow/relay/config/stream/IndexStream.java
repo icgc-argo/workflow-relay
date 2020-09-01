@@ -25,10 +25,14 @@ public interface IndexStream {
 
   String WORKFLOW = "workflowindex";
   String TASK = "taskindex";
+  String FAILED = "failedworkflowindex";
 
   @Input(WORKFLOW)
   SubscribableChannel workflowOutput();
 
   @Input(TASK)
   SubscribableChannel taskOutput();
+
+  @Input(FAILED)
+  SubscribableChannel failedOutput();
 }
