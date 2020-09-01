@@ -22,7 +22,7 @@ import java.time.Instant;
 import java.util.Map;
 import lombok.*;
 
-@Getter
+@Data
 @Builder
 @ToString
 @NoArgsConstructor
