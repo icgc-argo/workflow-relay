@@ -32,6 +32,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import static java.lang.String.format;
+import static org.icgc_argo.workflow.relay.model.index.WorkflowState.FAILED;
 
 @Profile("splitter")
 @Slf4j
@@ -41,16 +42,30 @@ public class SplitterService {
 
   private MessageChannel workflowOutput;
   private MessageChannel taskOutput;
+  private MessageChannel failedOutput;
 
   @Autowired
   public SplitterService(SplitStream splitStream) {
     this.workflowOutput = splitStream.workflowOutput();
     this.taskOutput = splitStream.taskOutput();
+    this.failedOutput = splitStream.failedOutput();
   }
 
   @StreamListener(SplitStream.WEBLOG)
   public void split(JsonNode event) {
-    if (event.has("trace")) {
+    if (event.has("event") && event.get("event").toString().equals(FAILED.toString())) {
+      // WORKFLOW MANAGEMENT FAILED EVENT
+      val runName = event.path("runName").asText();
+      log.debug(format("Processing failed pod event for runName: { %s }", runName));
+      failedOutput.send(
+          // TODO:
+          // https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
+          // See above message
+          MessageBuilder.withPayload(event)
+              // workflow topic key == nextflow runName (our wes id ... e.g. wes-1234567890abcdefg)
+              .setHeader(KafkaHeaders.MESSAGE_KEY, runName.getBytes())
+              .build());
+    } else if (event.has("trace")) {
       // NEXTFLOW TASK EVENT
       val runId = event.path("runId").asText();
       val runName = event.path("runName").asText();
@@ -60,9 +75,11 @@ public class SplitterService {
               "Processing task (Nextflow) event for runId: { %s }, runName: { %s }",
               runId, runName));
       taskOutput.send(
-          // TODO: https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
+          // TODO:
+          // https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
           // Before enabling compaction we need to ensure that we are passing our event UTC time to
-          // some yet to be developed custom header for compaction to use to determine order otherwise
+          // some yet to be developed custom header for compaction to use to determine order
+          // otherwise
           // order is not guaranteed and we could lose information
           MessageBuilder.withPayload(event)
               .setHeader(
@@ -78,7 +95,8 @@ public class SplitterService {
               "Processing workflow (Nextflow) event for runId: { %s }, runName: { %s }",
               runId, runName));
       workflowOutput.send(
-          // TODO: https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
+          // TODO:
+          // https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
           // See above message
           MessageBuilder.withPayload(event)
               // workflow topic key == nextflow runName (our wes id ... e.g. wes-1234567890abcdefg)
