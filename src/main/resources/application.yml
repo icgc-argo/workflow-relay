@@ -39,7 +39,7 @@ spring:
           failedworkflowindex:
             consumer:
               enableDlq: true
-              dlqName: workflow_dlq
+              dlqName: failedworkflow_dlq
               autoCommitOnError: true
               autoCommitOffset: true
       bindings:
