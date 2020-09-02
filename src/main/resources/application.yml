@@ -36,6 +36,12 @@ spring:
               dlqName: task_dlq
               autoCommitOnError: true
               autoCommitOffset: true
+          failedworkflowindex:
+            consumer:
+              enableDlq: true
+              dlqName: failedworkflow_dlq
+              autoCommitOnError: true
+              autoCommitOffset: true
       bindings:
         weblog:
           group: weblog
@@ -48,6 +54,10 @@ spring:
         task:
           group: splitter
           destination: task
+          contentType: application/json
+        failed:
+          group: splitter
+          destination: failed
           contentType: application/json
         weblogout:
           group: splitter
@@ -62,6 +72,12 @@ spring:
         taskindex:
           group: index
           destination: task
+          consumer:
+            maxAttempts: 4
+          contentType: application/json
+        failedworkflowindex:
+          group: index
+          destination: workflow
           consumer:
             maxAttempts: 4
           contentType: application/json
