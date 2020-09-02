@@ -48,10 +48,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 
 import static java.lang.String.format;
-import static java.time.OffsetDateTime.now;
 import static org.icgc_argo.workflow.relay.exceptions.NotFoundException.checkNotFound;
 import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
 
@@ -137,10 +136,10 @@ public class IndexService {
 
     // update the document status, duration, and success
     val workflowDoc = MAPPER.convertValue(getResponse.getSourceAsMap(), WorkflowDocument.class);
-    val currentTime = now(ZoneOffset.UTC);
+    val completeTime = OffsetDateTime.parse(event.get("utcTime").toString());
     workflowDoc.setState(WorkflowState.FAILED);
-    workflowDoc.setCompleteTime(currentTime.toInstant());
-    workflowDoc.setDuration(Duration.between(workflowDoc.getStartTime(), currentTime).toMillis());
+    workflowDoc.setCompleteTime(completeTime.toInstant());
+    workflowDoc.setDuration(Duration.between(workflowDoc.getStartTime(), completeTime).toMillis());
     workflowDoc.setSuccess(false);
 
     // index document
