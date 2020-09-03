@@ -77,7 +77,7 @@ spring:
           contentType: application/json
         failedworkflowindex:
           group: index
-          destination: workflow
+          destination: failed
           consumer:
             maxAttempts: 4
           contentType: application/json

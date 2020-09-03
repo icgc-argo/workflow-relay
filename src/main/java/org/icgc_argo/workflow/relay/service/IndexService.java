@@ -125,18 +125,17 @@ public class IndexService {
   @StreamListener(IndexStream.FAILED)
   public void updateFailedWorkflow(JsonNode event) {
     // get the existing workflow doc (remember we map runName to runId)
-    val runid = event.get("runName").toString();
+    val runid = event.path("runName").asText();
 
     // get the existing document (if it exists)
     GetRequest getRequest = new GetRequest(workflowIndex, runid);
     val getResponse = esClient.get(getRequest, RequestOptions.DEFAULT);
 
-    checkNotFound(
-        getResponse.isExists(), String.format("No document exists with runId: %s", runid));
+    checkNotFound(getResponse.isExists(), "No document exists with runId: %s", runid);
 
     // update the document status, duration, and success
     val workflowDoc = MAPPER.convertValue(getResponse.getSourceAsMap(), WorkflowDocument.class);
-    val completeTime = OffsetDateTime.parse(event.get("utcTime").toString());
+    val completeTime = OffsetDateTime.parse(event.path("utcTime").asText());
     workflowDoc.setState(WorkflowState.FAILED);
     workflowDoc.setCompleteTime(completeTime.toInstant());
     workflowDoc.setDuration(Duration.between(workflowDoc.getStartTime(), completeTime).toMillis());

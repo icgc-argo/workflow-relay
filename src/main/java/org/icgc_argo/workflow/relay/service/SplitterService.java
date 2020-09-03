@@ -53,7 +53,7 @@ public class SplitterService {
 
   @StreamListener(SplitStream.WEBLOG)
   public void split(JsonNode event) {
-    if (event.has("event") && event.get("event").toString().equals(FAILED.toString())) {
+    if (event.has("event") && event.path("event").asText().equals(FAILED.toString())) {
       // WORKFLOW MANAGEMENT FAILED EVENT
       val runName = event.path("runName").asText();
       log.debug(format("Processing failed pod event for runName: { %s }", runName));
