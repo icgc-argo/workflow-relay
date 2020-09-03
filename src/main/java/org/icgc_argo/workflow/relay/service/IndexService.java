@@ -18,9 +18,6 @@
 
 package org.icgc_argo.workflow.relay.service;
 
-import static java.lang.String.format;
-import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +28,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.elasticsearch.ElasticsearchStatusException;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -38,6 +36,8 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.VersionType;
 import org.icgc_argo.workflow.relay.config.elastic.ElasticsearchProperties;
 import org.icgc_argo.workflow.relay.config.stream.IndexStream;
+import org.icgc_argo.workflow.relay.model.index.WorkflowDocument;
+import org.icgc_argo.workflow.relay.model.index.WorkflowState;
 import org.icgc_argo.workflow.relay.model.nextflow.TaskEvent;
 import org.icgc_argo.workflow.relay.model.nextflow.WorkflowEvent;
 import org.icgc_argo.workflow.relay.util.NextflowDocumentConverter;
@@ -46,6 +46,13 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.time.OffsetDateTime;
+
+import static java.lang.String.format;
+import static org.icgc_argo.workflow.relay.exceptions.NotFoundException.checkNotFound;
+import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
 
 @Profile("index")
 @Slf4j
@@ -81,27 +88,8 @@ public class IndexService {
     val workflowEvent = MAPPER.treeToValue(event, WorkflowEvent.class);
     val doc = NextflowDocumentConverter.buildWorkflowDocument(workflowEvent);
 
-    // serialize index objects to json
-    val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
-
-    // Log and index
-    log.info(
-        format(
-            "Indexing workflow information for run with runId: { %s }, sessionId: { %s }",
-            doc.getRunId(), doc.getSessionId()));
-
-    // Log and index
-    val request = new IndexRequest(workflowIndex);
-    request.id(doc.getRunId());
-    request.source(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
-    request.versionType(VersionType.EXTERNAL);
-    request.version(doc.getState().ordinal());
-    try {
-      val indexResponse = esClient.index(request, RequestOptions.DEFAULT);
-      log.trace(indexResponse.toString());
-    } catch (ElasticsearchStatusException e) {
-      log.trace("Out of order, already have newer version for run {}", doc.getRunId());
-    }
+    // index document
+    indexWorkflowDocIfNewVersion(doc);
   }
 
   @SneakyThrows
@@ -130,6 +118,55 @@ public class IndexService {
           "Out of order, already have newer version for task {} in run {}",
           doc.getTaskId(),
           doc.getRunId());
+    }
+  }
+
+  @SneakyThrows
+  @StreamListener(IndexStream.FAILED)
+  public void updateFailedWorkflow(JsonNode event) {
+    // get the existing workflow doc (remember we map runName to runId)
+    val runid = event.path("runName").asText();
+
+    // get the existing document (if it exists)
+    GetRequest getRequest = new GetRequest(workflowIndex, runid);
+    val getResponse = esClient.get(getRequest, RequestOptions.DEFAULT);
+
+    checkNotFound(getResponse.isExists(), "No document exists with runId: %s", runid);
+
+    // update the document status, duration, and success
+    val workflowDoc = MAPPER.convertValue(getResponse.getSourceAsMap(), WorkflowDocument.class);
+    val completeTime = OffsetDateTime.parse(event.path("utcTime").asText());
+    workflowDoc.setState(WorkflowState.FAILED);
+    workflowDoc.setCompleteTime(completeTime.toInstant());
+    workflowDoc.setDuration(Duration.between(workflowDoc.getStartTime(), completeTime).toMillis());
+    workflowDoc.setSuccess(false);
+
+    // index document
+    indexWorkflowDocIfNewVersion(workflowDoc);
+  }
+
+  @SneakyThrows
+  private void indexWorkflowDocIfNewVersion(WorkflowDocument doc) {
+    // serialize index objects to json
+    val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
+
+    // Log and index
+    log.info(
+        format(
+            "Indexing workflow information for run with runId: { %s }, sessionId: { %s }",
+            doc.getRunId(), doc.getSessionId()));
+
+    // Log and index
+    val request = new IndexRequest(workflowIndex);
+    request.id(doc.getRunId());
+    request.source(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
+    request.versionType(VersionType.EXTERNAL);
+    request.version(doc.getState().ordinal());
+    try {
+      val indexResponse = esClient.index(request, RequestOptions.DEFAULT);
+      log.trace(indexResponse.toString());
+    } catch (ElasticsearchStatusException e) {
+      log.trace("Out of order, already have newer version for run {}", doc.getRunId());
     }
   }
 }
