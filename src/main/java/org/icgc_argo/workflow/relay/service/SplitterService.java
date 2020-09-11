@@ -53,19 +53,7 @@ public class SplitterService {
 
   @StreamListener(SplitStream.WEBLOG)
   public void split(JsonNode event) {
-    if (event.has("event") && event.path("event").asText().equals(FAILED.toString())) {
-      // WORKFLOW MANAGEMENT FAILED EVENT
-      val runName = event.path("runName").asText();
-      log.debug(format("Processing failed pod event for runName: { %s }", runName));
-      failedOutput.send(
-          // TODO:
-          // https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
-          // See above message
-          MessageBuilder.withPayload(event)
-              // workflow topic key == nextflow runName (our wes id ... e.g. wes-1234567890abcdefg)
-              .setHeader(KafkaHeaders.MESSAGE_KEY, runName.getBytes())
-              .build());
-    } else if (event.has("trace")) {
+    if (event.has("trace")) {
       // NEXTFLOW TASK EVENT
       val runId = event.path("runId").asText();
       val runName = event.path("runName").asText();
@@ -95,6 +83,18 @@ public class SplitterService {
               "Processing workflow (Nextflow) event for runId: { %s }, runName: { %s }",
               runId, runName));
       workflowOutput.send(
+          // TODO:
+          // https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
+          // See above message
+          MessageBuilder.withPayload(event)
+              // workflow topic key == nextflow runName (our wes id ... e.g. wes-1234567890abcdefg)
+              .setHeader(KafkaHeaders.MESSAGE_KEY, runName.getBytes())
+              .build());
+    } else if (event.has("event") && event.path("event").asText().equals(FAILED.toString())) {
+      // WORKFLOW MANAGEMENT FAILED EVENT
+      val runName = event.path("runName").asText();
+      log.debug(format("Processing failed pod event for runName: { %s }", runName));
+      failedOutput.send(
           // TODO:
           // https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
           // See above message
