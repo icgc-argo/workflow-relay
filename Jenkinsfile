@@ -69,7 +69,7 @@ spec:
                     }
                     steps {
                         container('docker') {
-                            withCredentials([usernamePassword(credentialsId:'argoDockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                            withCredentials([usernamePassword(credentialsId:'argoContaines', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                                 sh 'docker login ghcr.io -u $USERNAME -p $PASSWORD'
                             }
 
@@ -122,7 +122,7 @@ spec:
                               sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${gitHubRepo} --tags"
                             }
 
-                            withCredentials([usernamePassword(credentialsId:'argoDockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                            withCredentials([usernamePassword(credentialsId:'argoContaines', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                                 sh 'docker login ghcr.io -u $USERNAME -p $PASSWORD'
                             }
 
