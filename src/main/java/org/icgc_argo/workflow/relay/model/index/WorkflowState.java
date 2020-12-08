@@ -31,9 +31,7 @@ public enum WorkflowState {
 
   EXECUTOR_ERROR("EXECUTOR_ERROR"),
 
-  FAILED("FAILED"),
-
-  ERROR("ERROR");
+  FAILED("FAILED");
 
   @NonNull private final String value;
 
