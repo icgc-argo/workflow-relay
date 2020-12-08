@@ -112,12 +112,13 @@ public class IndexService {
     request.version(doc.getState().ordinal());
     try {
       val indexResponse = esClient.index(request, RequestOptions.DEFAULT);
-      log.trace(indexResponse.toString());
+      log.debug(indexResponse.toString());
     } catch (ElasticsearchStatusException e) {
-      log.trace(
-          "Out of order, already have newer version for task {} in run {}",
+      log.error(
+          "Out of order, already have newer version for task {} in run {}, exception: {}",
           doc.getTaskId(),
-          doc.getRunId());
+          doc.getRunId(),
+          e.getLocalizedMessage());
     }
   }
 
@@ -164,9 +165,12 @@ public class IndexService {
     request.version(doc.getState().ordinal());
     try {
       val indexResponse = esClient.index(request, RequestOptions.DEFAULT);
-      log.trace(indexResponse.toString());
+      log.debug(indexResponse.toString());
     } catch (ElasticsearchStatusException e) {
-      log.trace("Out of order, already have newer version for run {}", doc.getRunId());
+      log.error(
+          "Out of order, already have newer version for run {}, exception: {}",
+          doc.getRunId(),
+          e.getLocalizedMessage());
     }
   }
 }
