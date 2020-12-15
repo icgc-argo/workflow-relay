@@ -1,13 +1,16 @@
 package org.icgc_argo.workflow.relay.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.icgc_argo.workflow.relay.config.elastic.ElasticsearchProperties;
 import org.icgc_argo.workflow.relay.config.stream.GraphLogStream;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,8 @@ import org.springframework.stereotype.Service;
 @EnableBinding(GraphLogStream.class)
 @Service
 public class WorkflowGraphLogService {
+
+  private static final ObjectMapper MAPPER = new ObjectMapper();
 
   private final RestHighLevelClient esClient;
   private final String graphLogInfoDebugIndex;
@@ -48,8 +53,10 @@ public class WorkflowGraphLogService {
   @SneakyThrows
   private void indexGraphLog(String index, JsonNode event) {
     log.info("Indexing GraphLog event into {}: {}", index, event.toString());
+    val source = MAPPER.writeValueAsBytes(event);
     val request = new IndexRequest(index);
-    request.source(event);
+    request.id(DigestUtils.sha1Hex(source));
+    request.source(source, XContentType.JSON);
     val indexResponse = esClient.index(request, RequestOptions.DEFAULT);
     log.debug(indexResponse.toString());
   }
