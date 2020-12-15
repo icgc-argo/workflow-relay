@@ -115,8 +115,8 @@ elastic:
   password: testing
   workflowIndex: workflow
   taskIndex: task
-  graphLogInfoDebugIndex: graphlog-infodebug
-  graphLogErrorWarningIndex: graphlog-errorwarning
+  graphLogInfoDebugIndex: graphlog_infoDebug
+  graphLogErrorWarningIndex: graphlog_errorWarning
   numberOfShards: 3
   numberOfReplicas: 2
 
