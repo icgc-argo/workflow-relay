@@ -23,7 +23,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-@Profile("index")
+@Profile({"index", "graphlog"})
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "elastic")
@@ -37,6 +37,8 @@ public class ElasticsearchProperties {
   Boolean useAuthentication;
   String workflowIndex;
   String taskIndex;
+  String graphLogInfoDebugIndex;
+  String graphLogErrorWarningIndex;
   Integer numberOfShards;
   Integer numberOfReplicas;
 }
