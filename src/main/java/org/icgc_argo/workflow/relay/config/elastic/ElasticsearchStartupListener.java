@@ -28,16 +28,19 @@ import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.icgc_argo.workflow.relay.config.ProfileManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
 import static org.icgc_argo.workflow.relay.util.StringUtilities.inputStreamToString;
 
 @Profile({"index", "graphlog"})
@@ -47,7 +50,7 @@ public class ElasticsearchStartupListener implements ApplicationListener<Context
 
   private final RestHighLevelClient client;
   private final ElasticsearchProperties properties;
-  private final ProfileManager profileManager;
+  private final List<String> activeProfiles;
 
   @Value("classpath:run_log_mapping.json")
   private Resource workflowIndexMapping;
@@ -62,17 +65,15 @@ public class ElasticsearchStartupListener implements ApplicationListener<Context
   public ElasticsearchStartupListener(
       @NonNull RestHighLevelClient client,
       @NonNull ElasticsearchProperties properties,
-      @NonNull ProfileManager profileManager) {
+      @Autowired Environment environment) {
     this.client = client;
     this.properties = properties;
-    this.profileManager = profileManager;
+    this.activeProfiles = asList(environment.getActiveProfiles());
   }
 
   @Override
   public void onApplicationEvent(ContextRefreshedEvent event) {
     log.info("Ensuring index initialization...");
-
-    val activeProfiles = profileManager.getActiveProfiles();
 
     if (activeProfiles.contains("index")) {
       ensureIndex(properties.workflowIndex, event);
