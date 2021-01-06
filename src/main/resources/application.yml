@@ -42,6 +42,18 @@ spring:
               dlqName: failedworkflow_dlq
               autoCommitOnError: true
               autoCommitOffset: true
+          graphlog_info_debug_index:
+            consumer:
+              enableDlq: true
+              dlqName: graphlog_info_debug_dlq
+              autoCommitOnError: true
+              autoCommitOffset: true
+          graphlog_error_warning_index:
+            consumer:
+              enableDlq: true
+              dlqName: graphlog_error_warning_dlq
+              autoCommitOnError: true
+              autoCommitOffset: true
       bindings:
         weblog:
           group: weblog
@@ -81,6 +93,18 @@ spring:
           consumer:
             maxAttempts: 4
           contentType: application/json
+        graphlog_info_debug_index:
+          group: graphlog
+          destination: graphlog_info_debug
+          consumer:
+            maxAttempts: 4
+          contentType: application/json
+        graphlog_error_warning_index:
+          group: graphlog
+          destination: graphlog_error_warning
+          consumer:
+            maxAttempts: 4
+          contentType: application/json
 
 elastic:
   host: localhost
@@ -91,6 +115,8 @@ elastic:
   password: testing
   workflowIndex: workflow
   taskIndex: task
+  graphLogInfoDebugIndex: graphlog_info_debug
+  graphLogErrorWarningIndex: graphlog_error_warning
   numberOfShards: 3
   numberOfReplicas: 2
 

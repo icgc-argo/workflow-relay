@@ -1,0 +1,25 @@
+{
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "log": {
+        "type": "text"
+      },
+      "graphMessageId": {
+        "type": "keyword"
+      },
+      "queue": {
+        "type": "keyword"
+      },
+      "node": {
+        "type": "keyword"
+      },
+      "pipeline": {
+        "type": "keyword"
+      },
+      "timestamp": {
+        "type": "long"
+      }
+    }
+  }
+}
