@@ -36,6 +36,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.VersionType;
 import org.icgc_argo.workflow.relay.config.elastic.ElasticsearchProperties;
 import org.icgc_argo.workflow.relay.config.stream.IndexStream;
+import org.icgc_argo.workflow.relay.model.index.WorkflowManagementEvent;
 import org.icgc_argo.workflow.relay.model.index.WorkflowDocument;
 import org.icgc_argo.workflow.relay.model.index.WorkflowState;
 import org.icgc_argo.workflow.relay.model.nextflow.TaskEvent;
@@ -51,7 +52,6 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 
 import static java.lang.String.format;
-import static org.icgc_argo.workflow.relay.exceptions.NotFoundException.checkNotFound;
 import static org.icgc_argo.workflow.relay.util.OffsetDateTimeDeserializer.getOffsetDateTimeModule;
 
 @Profile("index")
@@ -123,26 +123,44 @@ public class IndexService {
   }
 
   @SneakyThrows
-  @StreamListener(IndexStream.FAILED)
-  public void updateFailedWorkflow(JsonNode event) {
-    // get the existing workflow doc (remember we map runName to runId)
-    val runid = event.path("runName").asText();
+  @StreamListener(IndexStream.WF_MGMT_EVENT)
+  public void indexWfMgmtWorkflowEvent(JsonNode event) {
+    val mgmtEvent = MAPPER.convertValue(event, WorkflowManagementEvent.class);
 
-    // get the existing document (if it exists)
-    GetRequest getRequest = new GetRequest(workflowIndex, runid);
+    // get the existing workflow doc (remember we map runName to runId)
+    val runid = mgmtEvent.getRunName();
+
+    val getRequest = new GetRequest(workflowIndex, runid);
     val getResponse = esClient.get(getRequest, RequestOptions.DEFAULT);
 
-    checkNotFound(getResponse.isExists(), "No document exists with runId: %s", runid);
+    WorkflowDocument workflowDoc;
+    if (getResponse.isExists()) {
+      workflowDoc = MAPPER.convertValue(getResponse.getSourceAsMap(), WorkflowDocument.class);
+      workflowDoc.setState(WorkflowState.findByValue(mgmtEvent.getEvent()));
+    } else {
+      log.info("No document exists with runId: {}", runid);
+      val startTime = OffsetDateTime.parse(mgmtEvent.getEvent());
+      workflowDoc = WorkflowDocument
+        .builder()
+        .runId(runid)
+        .sessionId(mgmtEvent.getRunName())
+        .repository(mgmtEvent.getRunParams().getWorkflowUrl())
+        .parameters(mgmtEvent.getRunParams().getWorkflowParams())
+        .engineParameters(mgmtEvent.getRunParams().getWorkflowEngineParams())
+        .state(WorkflowState.findByValue(mgmtEvent.getEvent()))
+        .startTime(startTime.toInstant())
+        .commandLine("")
+        .success(false)
+        .build();
+    }
 
-    // update the document status, duration, and success
-    val workflowDoc = MAPPER.convertValue(getResponse.getSourceAsMap(), WorkflowDocument.class);
-    val completeTime = OffsetDateTime.parse(event.path("utcTime").asText());
-    workflowDoc.setState(WorkflowState.FAILED);
-    workflowDoc.setCompleteTime(completeTime.toInstant());
-    workflowDoc.setDuration(Duration.between(workflowDoc.getStartTime(), completeTime).toMillis());
-    workflowDoc.setSuccess(false);
+    if (mgmtEvent.getEvent().equalsIgnoreCase(WorkflowState.FAILED.toString())) {
+      val completeTime = OffsetDateTime.parse(event.path("utcTime").asText());
+      workflowDoc.setCompleteTime(completeTime.toInstant());
+      workflowDoc.setDuration(Duration.between(workflowDoc.getStartTime(), completeTime).toMillis());
+      workflowDoc.setSuccess(false);
+    }
 
-    // index document
     indexWorkflowDocIfNewVersion(workflowDoc);
   }
 

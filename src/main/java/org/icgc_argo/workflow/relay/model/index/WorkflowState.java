@@ -21,6 +21,8 @@ package org.icgc_argo.workflow.relay.model.index;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 @RequiredArgsConstructor
 public enum WorkflowState {
   UNKNOWN("UNKNOWN"),
@@ -33,7 +35,11 @@ public enum WorkflowState {
 
   FAILED("FAILED"),
 
-  ERROR("ERROR");
+  ERROR("ERROR"),
+
+  QUEUED("QUEUED"),
+
+  INITIALIZED("INITIALIZED");
 
   @NonNull private final String value;
 
@@ -45,6 +51,10 @@ public enum WorkflowState {
     } else if (text.equalsIgnoreCase("completed") && !success) {
       return WorkflowState.EXECUTOR_ERROR;
     } else return WorkflowState.UNKNOWN;
+  }
+
+  public static WorkflowState findByValue(String value) {
+    return Arrays.stream(WorkflowState.values()).filter(ws -> ws.toString().equalsIgnoreCase(value)).findFirst().orElse(UNKNOWN);
   }
 
   @Override

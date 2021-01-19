@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
 
 import static java.lang.String.format;
 import static org.icgc_argo.workflow.relay.model.index.WorkflowState.ERROR;
-import static org.icgc_argo.workflow.relay.model.index.WorkflowState.FAILED;
 
 @Profile("splitter")
 @Slf4j
@@ -41,15 +40,15 @@ import static org.icgc_argo.workflow.relay.model.index.WorkflowState.FAILED;
 @EnableBinding(SplitStream.class)
 public class SplitterService {
 
-  private MessageChannel workflowOutput;
-  private MessageChannel taskOutput;
-  private MessageChannel failedOutput;
+  private final MessageChannel workflowOutput;
+  private final MessageChannel taskOutput;
+  private final MessageChannel wfMgmtEventOutput;
 
   @Autowired
   public SplitterService(SplitStream splitStream) {
     this.workflowOutput = splitStream.workflowOutput();
     this.taskOutput = splitStream.taskOutput();
-    this.failedOutput = splitStream.failedOutput();
+    this.wfMgmtEventOutput = splitStream.wfMgmtEventOutput();
   }
 
   @StreamListener(SplitStream.WEBLOG)
@@ -91,11 +90,17 @@ public class SplitterService {
               // workflow topic key == nextflow runName (our wes id ... e.g. wes-1234567890abcdefg)
               .setHeader(KafkaHeaders.MESSAGE_KEY, runName.getBytes())
               .build());
-    } else if (event.has("event") && event.path("event").asText().equals(FAILED.toString())) {
-      // WORKFLOW MANAGEMENT FAILED EVENT
+    }  else if (event.has("event") && event.path("event").asText().equals(ERROR.toString())) {
+      // Error logs already handled above so we can ignore these raw error messages as they have
+      // almost no context past just letting you know that an error has occurred, which we can infer
+      // by looking at the detailed log
+      log.debug(
+              "Received raw error event, no handler specified at this time: {}", event.toString());
+    } else if (event.has("event")) {
+      // WORKFLOW MANAGEMENT EVENT
       val runName = event.path("runName").asText();
-      log.debug(format("Processing failed pod event for runName: { %s }", runName));
-      failedOutput.send(
+      log.debug(format("Wf-mgmt event for runName: { %s }", runName));
+      wfMgmtEventOutput.send(
           // TODO:
           // https://cwiki.apache.org/confluence/display/KAFKA/KIP-280%3A+Enhanced+log+compaction
           // See above message
@@ -103,12 +108,6 @@ public class SplitterService {
               // workflow topic key == nextflow runName (our wes id ... e.g. wes-1234567890abcdefg)
               .setHeader(KafkaHeaders.MESSAGE_KEY, runName.getBytes())
               .build());
-    } else if (event.has("event") && event.path("event").asText().equals(ERROR.toString())) {
-      // Error logs already handled above so we can ignore these raw error messages as they have
-      // almost no context past just letting you know that an error has occurred, which we can infer
-      // by looking at the detailed log
-      log.debug(
-          "Received raw error event, no handler specified at this time: {}", event.toString());
     } else {
       log.error("Unhandled event: {}", event.toString());
       throw new RuntimeException("Cannot handle event, please see DLQ for event information");

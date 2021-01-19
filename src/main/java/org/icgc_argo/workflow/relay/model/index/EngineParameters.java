@@ -18,6 +18,7 @@
 
 package org.icgc_argo.workflow.relay.model.index;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
@@ -27,10 +28,13 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EngineParameters {
+  String defaultContainer;
   String launchDir;
   String projectDir;
   String workDir;
   String revision;
   String resume;
+  String latest;
 }
