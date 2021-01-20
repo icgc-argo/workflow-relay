@@ -27,6 +27,10 @@ import java.util.Arrays;
 public enum WorkflowState {
   UNKNOWN("UNKNOWN"),
 
+  QUEUED("QUEUED"),
+
+  INITIALIZED("INITIALIZED"),
+
   RUNNING("RUNNING"),
 
   COMPLETE("COMPLETE"),
@@ -35,11 +39,7 @@ public enum WorkflowState {
 
   FAILED("FAILED"),
 
-  ERROR("ERROR"),
-
-  QUEUED("QUEUED"),
-
-  INITIALIZED("INITIALIZED");
+  ERROR("ERROR");
 
   @NonNull private final String value;
 
