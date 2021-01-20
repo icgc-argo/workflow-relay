@@ -23,5 +23,6 @@ public class WorkflowManagementEvent {
                 String workflowTypeVersion;
                 EngineParameters workflowEngineParams;
                 Map<String, Object> workflowParams;
+                String runName;
         }
 }

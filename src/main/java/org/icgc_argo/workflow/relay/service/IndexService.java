@@ -139,11 +139,11 @@ public class IndexService {
       workflowDoc.setState(WorkflowState.findByValue(mgmtEvent.getEvent()));
     } else {
       log.info("No document exists with runId: {}", runid);
-      val startTime = OffsetDateTime.parse(mgmtEvent.getEvent());
+      val startTime = OffsetDateTime.parse(mgmtEvent.getUtcTime());
       workflowDoc = WorkflowDocument
         .builder()
         .runId(runid)
-        .sessionId(mgmtEvent.getRunName())
+        .sessionId("")
         .repository(mgmtEvent.getRunParams().getWorkflowUrl())
         .parameters(mgmtEvent.getRunParams().getWorkflowParams())
         .engineParameters(mgmtEvent.getRunParams().getWorkflowEngineParams())
