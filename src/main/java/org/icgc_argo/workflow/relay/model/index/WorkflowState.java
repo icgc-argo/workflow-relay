@@ -25,15 +25,23 @@ import lombok.RequiredArgsConstructor;
 public enum WorkflowState {
   UNKNOWN("UNKNOWN"),
 
+  QUEUED("QUEUED"),
+
+  INITIALIZING("INITIALIZING"),
+
   RUNNING("RUNNING"),
+
+  PAUSED("PAUSED"),
+
+  CANCELING("CANCELING"),
+
+  CANCELED("CANCELED"),
 
   COMPLETE("COMPLETE"),
 
   EXECUTOR_ERROR("EXECUTOR_ERROR"),
 
-  FAILED("FAILED"),
-
-  ERROR("ERROR");
+  SYSTEM_ERROR("SYSTEM_ERROR");
 
   @NonNull private final String value;
 
@@ -44,6 +52,8 @@ public enum WorkflowState {
       return WorkflowState.COMPLETE;
     } else if (text.equalsIgnoreCase("completed") && !success) {
       return WorkflowState.EXECUTOR_ERROR;
+    }  else if (text.equalsIgnoreCase("failed")) {
+      return WorkflowState.SYSTEM_ERROR;
     } else return WorkflowState.UNKNOWN;
   }
 

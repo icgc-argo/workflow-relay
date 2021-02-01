@@ -25,7 +25,7 @@ public interface IndexStream {
 
   String WORKFLOW = "workflowindex";
   String TASK = "taskindex";
-  String FAILED = "failedworkflowindex";
+  String WF_MGMT_WORKFLOW = "wfmgmtworkflowindex";
 
   @Input(WORKFLOW)
   SubscribableChannel workflowOutput();
@@ -33,6 +33,6 @@ public interface IndexStream {
   @Input(TASK)
   SubscribableChannel taskOutput();
 
-  @Input(FAILED)
-  SubscribableChannel failedOutput();
+  @Input(WF_MGMT_WORKFLOW)
+  SubscribableChannel wfmgmtWorkflowOutput();
 }
