@@ -28,7 +28,7 @@ public interface SplitStream {
   String WEBLOG = "weblogout";
   String WORKFLOW = "workflow";
   String TASK = "task";
-  String WF_MGMT_EVENT = "wfmgmtevent";
+  String WF_MGMT = "wfmgmt";
 
   @Input(WEBLOG)
   SubscribableChannel webLogOutInput();
@@ -39,6 +39,6 @@ public interface SplitStream {
   @Output(TASK)
   MessageChannel taskOutput();
 
-  @Output(WF_MGMT_EVENT)
-  MessageChannel wfMgmtEventOutput();
+  @Output(WF_MGMT)
+  MessageChannel wfmgmtOutput();
 }

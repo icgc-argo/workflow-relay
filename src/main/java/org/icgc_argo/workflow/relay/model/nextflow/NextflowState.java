@@ -16,49 +16,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.icgc_argo.workflow.relay.model.index;
+package org.icgc_argo.workflow.relay.model.nextflow;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum WorkflowState {
-  UNKNOWN("UNKNOWN"),
+public enum NextflowState {
+    FAILED("FAILED"),
+    ERROR("ERROR");
 
-  QUEUED("QUEUED"),
-
-  INITIALIZING("INITIALIZING"),
-
-  RUNNING("RUNNING"),
-
-  PAUSED("PAUSED"),
-
-  CANCELING("CANCELING"),
-
-  CANCELED("CANCELED"),
-
-  COMPLETE("COMPLETE"),
-
-  EXECUTOR_ERROR("EXECUTOR_ERROR"),
-
-  SYSTEM_ERROR("SYSTEM_ERROR");
-
-  @NonNull private final String value;
-
-  public static WorkflowState fromValueAndSuccess(@NonNull String text, @NonNull boolean success) {
-    if (text.equalsIgnoreCase("started")) {
-      return WorkflowState.RUNNING;
-    } else if (text.equalsIgnoreCase("completed") && success) {
-      return WorkflowState.COMPLETE;
-    } else if (text.equalsIgnoreCase("completed") && !success) {
-      return WorkflowState.EXECUTOR_ERROR;
-    }  else if (text.equalsIgnoreCase("failed")) {
-      return WorkflowState.SYSTEM_ERROR;
-    } else return WorkflowState.UNKNOWN;
-  }
-
-  @Override
-  public String toString() {
-    return value;
-  }
+    @Getter @NonNull private final String value;
 }

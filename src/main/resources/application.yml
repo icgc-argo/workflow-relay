@@ -36,10 +36,10 @@ spring:
               dlqName: task_dlq
               autoCommitOnError: true
               autoCommitOffset: true
-          wfmgmteventworkflowindex:
+          wfmgmtworkflowindex:
             consumer:
               enableDlq: true
-              dlqName: wfmgmteventworkflowindex_dlq
+              dlqName: wfmgmtworkflowindex_dlq
               autoCommitOnError: true
               autoCommitOffset: true
           graphlog_info_debug_index:
@@ -67,9 +67,9 @@ spring:
           group: splitter
           destination: task
           contentType: application/json
-        wfmgmtevent:
+        wfmgmt:
           group: splitter
-          destination: wfmgmtevent
+          destination: wfmgmt
           contentType: application/json
         weblogout:
           group: splitter
@@ -87,9 +87,9 @@ spring:
           consumer:
             maxAttempts: 4
           contentType: application/json
-        wfmgmteventworkflowindex:
+        wfmgmtworkflowindex:
           group: index
-          destination: wfmgmtevent
+          destination: wfmgmt
           consumer:
             maxAttempts: 4
           contentType: application/json
