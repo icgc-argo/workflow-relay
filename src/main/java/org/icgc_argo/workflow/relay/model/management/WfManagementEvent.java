@@ -17,7 +17,7 @@ public class WfManagementEvent {
         @NonNull private String runId;
         @NonNull private WorkflowState event;
         @NonNull private String utcTime;
-        @NonNull private String workflowUrl;
+        private String workflowUrl;
         private String workflowType;
         private String workflowTypeVersion;
         private Map<String, Object> workflowParams;

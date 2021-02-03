@@ -21,6 +21,7 @@ package org.icgc_argo.workflow.relay.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.icgc_argo.workflow.relay.service.WebLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -50,7 +51,7 @@ public class WebLogController {
   public Mono<ResponseEntity<Boolean>> consumeEvent(@RequestBody JsonNode event) {
     // Use hashcode to see if identical events are being submitted
     log.debug("Received event with hashcode: {}", event.hashCode());
-    webLogService.handleEvent(event);
-    return Mono.just(new ResponseEntity<>(null, HttpStatus.OK));
+    val result = webLogService.handleEvent(event);
+    return Mono.just(new ResponseEntity<>(result, HttpStatus.OK));
   }
 }

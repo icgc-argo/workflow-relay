@@ -44,11 +44,11 @@ public class WebLogService {
     log.info("Paths to Sanitize {}", sanitizeProperties.getPaths().toString());
   }
 
-  public void handleEvent(@NonNull JsonNode event) {
+  public Boolean handleEvent(@NonNull JsonNode event) {
     log.info("handling event: {}", event);
     for (String path : sanitizeProperties.getPaths()) {
       Sanitize.sanitize(path, event);
     }
-    webLogStream.webLogOutput().send(MessageBuilder.withPayload(event).build());
+    return webLogStream.webLogOutput().send(MessageBuilder.withPayload(event).build());
   }
 }
