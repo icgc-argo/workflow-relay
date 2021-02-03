@@ -45,16 +45,18 @@ public enum WorkflowState {
 
   @NonNull private final String value;
 
-  public static WorkflowState fromValueAndSuccess(@NonNull String text, @NonNull boolean success) {
-    if (text.equalsIgnoreCase("started")) {
+  public static WorkflowState fromNextflowEventAndSuccess(@NonNull String nextflowEvent, @NonNull boolean success) {
+    if (nextflowEvent.equalsIgnoreCase("started")) {
       return WorkflowState.RUNNING;
-    } else if (text.equalsIgnoreCase("completed") && success) {
+    } else if (nextflowEvent.equalsIgnoreCase("completed") && success) {
       return WorkflowState.COMPLETE;
-    } else if (text.equalsIgnoreCase("completed") && !success) {
+    } else if ((nextflowEvent.equalsIgnoreCase("completed") && !success)
+               || nextflowEvent.equalsIgnoreCase("failed")
+               || nextflowEvent.equalsIgnoreCase("error")) {
       return WorkflowState.EXECUTOR_ERROR;
-    }  else if (text.equalsIgnoreCase("failed")) {
-      return WorkflowState.SYSTEM_ERROR;
-    } else return WorkflowState.UNKNOWN;
+    } else {
+      return WorkflowState.UNKNOWN;
+    }
   }
 
   @Override

@@ -17,7 +17,8 @@ public class WfManagementEvent {
         @NonNull private String runId;
         @NonNull private WorkflowState event;
         @NonNull private String utcTime;
-        @NonNull private String workflowUrl;
+        // TODO - workflowUrl needs to be @NonNull, its missing it now because currently only INITIALIZING events have this info available
+        private String workflowUrl;
         private String workflowType;
         private String workflowTypeVersion;
         private Map<String, Object> workflowParams;
