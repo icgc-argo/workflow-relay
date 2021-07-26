@@ -90,7 +90,7 @@ spec:
                         build(job: "/provision/update-app-version", parameters: [
                             [$class: 'StringParameterValue', name: 'RDPC_ENV', value: 'dev' ],
                             [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'relay-weblog'],
-                            [$class: 'StringParameterValue', name: 'https://github.com/icgc-argo/rdpc-gateway/pull/74', value: "${version}-${commit}" ]
+                            [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "${version}-${commit}" ]
                         ])
                         build(job: "/provision/update-app-version", parameters: [
                             [$class: 'StringParameterValue', name: 'RDPC_ENV', value: 'dev' ],
@@ -139,12 +139,12 @@ spec:
                             [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'relay-weblog'],
                             [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "${version}" ]
                         ])
-                        build(job: "/provision/helm", parameters: [
+                        build(job: "/provision/update-app-version", parameters: [
                             [$class: 'StringParameterValue', name: 'RDPC_ENV', value: 'qa' ],
                             [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'relay-splitter'],
                             [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "${version}" ]
                         ])
-                        build(job: "/provision/helm", parameters: [
+                        build(job: "/provision/update-app-version", parameters: [
                             [$class: 'StringParameterValue', name: 'RDPC_ENV', value: 'qa' ],
                             [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'relay-index'],
                             [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "${version}" ]
