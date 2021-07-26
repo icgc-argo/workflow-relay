@@ -1,6 +1,16 @@
 {
   "mappings": {
     "dynamic": false,
+    "dynamic_templates": [
+      {
+        "all_as_keyword": {
+          "match": "*",
+          "mapping": {
+            "type": "keyword"
+          }
+        }
+      }
+    ],
     "properties": {
       "runId": {
         "type": "keyword"
