@@ -1,13 +1,12 @@
 def dockerHub = "ghcr.io/icgc-argo/workflow-relay"
 def gitHubRepo = "icgc-argo/workflow-relay"
-def chartVersion = "0.5.0"
 def commit = "UNKNOWN"
 def version = "UNKNOWN"
 
 pipeline {
     agent {
         kubernetes {
-            label 'ego-executor'
+            label 'relay-executor'
             yaml """
 apiVersion: v1
 kind: Pod
@@ -88,26 +87,20 @@ spec:
                         branch "develop"
                     }
                     steps {
-                        build(job: "/provision/helm", parameters: [
-                            [$class: 'StringParameterValue', name: 'AP_RDPC_ENV', value: 'dev' ],
-                            [$class: 'StringParameterValue', name: 'AP_CHART_NAME', value: 'workflow-relay'],
-                            [$class: 'StringParameterValue', name: 'AP_RELEASE_NAME', value: 'relay-weblog'],
-                            [$class: 'StringParameterValue', name: 'AP_HELM_CHART_VERSION', value: "${chartVersion}"],
-                            [$class: 'StringParameterValue', name: 'AP_ARGS_LINE', value: "--set-string image.tag=${version}-${commit}" ]
+                        build(job: "/provision/update-app-version", parameters: [
+                            [$class: 'StringParameterValue', name: 'RDPC_ENV', value: 'dev' ],
+                            [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'relay-weblog'],
+                            [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "${version}-${commit}" ]
                         ])
-                        build(job: "/provision/helm", parameters: [
-                            [$class: 'StringParameterValue', name: 'AP_RDPC_ENV', value: 'dev' ],
-                            [$class: 'StringParameterValue', name: 'AP_CHART_NAME', value: 'workflow-relay'],
-                            [$class: 'StringParameterValue', name: 'AP_RELEASE_NAME', value: 'relay-splitter'],
-                            [$class: 'StringParameterValue', name: 'AP_HELM_CHART_VERSION', value: "${chartVersion}"],
-                            [$class: 'StringParameterValue', name: 'AP_ARGS_LINE', value: "--set-string image.tag=${version}-${commit}" ]
+                        build(job: "/provision/update-app-version", parameters: [
+                            [$class: 'StringParameterValue', name: 'RDPC_ENV', value: 'dev' ],
+                            [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'relay-splitter'],
+                            [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "${version}-${commit}" ]
                         ])
-                        build(job: "/provision/helm", parameters: [
-                            [$class: 'StringParameterValue', name: 'AP_RDPC_ENV', value: 'dev' ],
-                            [$class: 'StringParameterValue', name: 'AP_CHART_NAME', value: 'workflow-relay'],
-                            [$class: 'StringParameterValue', name: 'AP_RELEASE_NAME', value: 'relay-index'],
-                            [$class: 'StringParameterValue', name: 'AP_HELM_CHART_VERSION', value: "${chartVersion}"],
-                            [$class: 'StringParameterValue', name: 'AP_ARGS_LINE', value: "--set-string image.tag=${version}-${commit}" ]
+                        build(job: "/provision/update-app-version", parameters: [
+                            [$class: 'StringParameterValue', name: 'RDPC_ENV', value: 'dev' ],
+                            [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'relay-index'],
+                            [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "${version}-${commit}" ]
                         ])
                     }
                 }
@@ -141,26 +134,20 @@ spec:
                         branch "master"
                     }
                     steps {
-                        build(job: "/provision/helm", parameters: [
-                            [$class: 'StringParameterValue', name: 'AP_RDPC_ENV', value: 'qa' ],
-                            [$class: 'StringParameterValue', name: 'AP_CHART_NAME', value: 'workflow-relay'],
-                            [$class: 'StringParameterValue', name: 'AP_RELEASE_NAME', value: 'relay-weblog'],
-                            [$class: 'StringParameterValue', name: 'AP_HELM_CHART_VERSION', value: "${chartVersion}"],
-                            [$class: 'StringParameterValue', name: 'AP_ARGS_LINE', value: "--set-string image.tag=${version}" ]
+                        build(job: "/provision/update-app-version", parameters: [
+                            [$class: 'StringParameterValue', name: 'RDPC_ENV', value: 'qa' ],
+                            [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'relay-weblog'],
+                            [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "${version}" ]
                         ])
-                        build(job: "/provision/helm", parameters: [
-                            [$class: 'StringParameterValue', name: 'AP_RDPC_ENV', value: 'qa' ],
-                            [$class: 'StringParameterValue', name: 'AP_CHART_NAME', value: 'workflow-relay'],
-                            [$class: 'StringParameterValue', name: 'AP_RELEASE_NAME', value: 'relay-splitter'],
-                            [$class: 'StringParameterValue', name: 'AP_HELM_CHART_VERSION', value: "${chartVersion}"],
-                            [$class: 'StringParameterValue', name: 'AP_ARGS_LINE', value: "--set-string image.tag=${version}" ]
+                        build(job: "/provision/update-app-version", parameters: [
+                            [$class: 'StringParameterValue', name: 'RDPC_ENV', value: 'qa' ],
+                            [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'relay-splitter'],
+                            [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "${version}" ]
                         ])
-                        build(job: "/provision/helm", parameters: [
-                            [$class: 'StringParameterValue', name: 'AP_RDPC_ENV', value: 'qa' ],
-                            [$class: 'StringParameterValue', name: 'AP_CHART_NAME', value: 'workflow-relay'],
-                            [$class: 'StringParameterValue', name: 'AP_RELEASE_NAME', value: 'relay-index'],
-                            [$class: 'StringParameterValue', name: 'AP_HELM_CHART_VERSION', value: "${chartVersion}"],
-                            [$class: 'StringParameterValue', name: 'AP_ARGS_LINE', value: "--set-string image.tag=${version}" ]
+                        build(job: "/provision/update-app-version", parameters: [
+                            [$class: 'StringParameterValue', name: 'RDPC_ENV', value: 'qa' ],
+                            [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'relay-index'],
+                            [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "${version}" ]
                         ])
                     }
                 }
