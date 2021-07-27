@@ -39,7 +39,7 @@ spring:
           wfmgmtworkflowindex:
             consumer:
               enableDlq: true
-              dlqName: wfmgmtworkflowindex_dlq
+              dlqName: wfmgmt_dlq
               autoCommitOnError: true
               autoCommitOffset: true
           graphlog_info_debug_index:
