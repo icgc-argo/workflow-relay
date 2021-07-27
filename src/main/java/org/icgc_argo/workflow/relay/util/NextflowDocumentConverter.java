@@ -60,7 +60,7 @@ public class NextflowDocumentConverter {
         WorkflowDocument.builder()
             .runId(workflowEvent.getRunName())
             .sessionId(workflowEvent.getRunId())
-            .state(WorkflowState.fromValueAndSuccess(workflowEvent.getEvent(), success))
+            .state(WorkflowState.fromNextflowEventAndSuccess(workflowEvent.getEvent(), success))
             .parameters(workflowEvent.getMetadata().getParameters())
             .engineParameters(engineParams)
             .startTime(workflow.getStart().toInstant())

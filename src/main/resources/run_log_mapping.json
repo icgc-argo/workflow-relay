@@ -1,6 +1,38 @@
 {
   "mappings": {
     "dynamic": true,
+    "dynamic_templates": [
+      {
+        "date_as_keyword": {
+          "match_mapping_type": "date",
+          "mapping": { "type": "keyword" }
+        }
+      },
+      {
+        "boolean_as_keyword": {
+          "match_mapping_type": "boolean",
+          "mapping": { "type": "keyword" }
+        }
+      },
+      {
+        "long_as_keyword": {
+          "match_mapping_type": "long",
+          "mapping": { "type": "keyword" }
+        }
+      },
+      {
+        "double_as_keyword": {
+          "match_mapping_type": "double",
+          "mapping": { "type": "keyword" }
+        }
+      },
+      {
+        "binary_as_keyword": {
+          "match_mapping_type": "binary",
+          "mapping": { "type": "keyword" }
+        }
+      }
+    ],
     "properties": {
       "runId": {
         "type": "keyword"

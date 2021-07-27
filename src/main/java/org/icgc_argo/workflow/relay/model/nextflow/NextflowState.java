@@ -16,25 +16,16 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.icgc_argo.workflow.relay.model.index;
+package org.icgc_argo.workflow.relay.model.nextflow;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class EngineParameters {
-  String defaultContainer;
-  String launchDir;
-  String projectDir;
-  String workDir;
-  String revision;
-  String resume;
-  String latest;
+@RequiredArgsConstructor
+public enum NextflowState {
+    FAILED("FAILED"),
+    ERROR("ERROR");
+
+    @Getter @NonNull private final String value;
 }
