@@ -50,13 +50,15 @@
         "type": "date_nanos"
       },
       "repository": {
-        "type": "text"
+        "type": "text",
+        "analyzer": "simple"
       },
       "exitStatus": {
         "type": "integer"
       },
       "commandLine":{
-        "type": "text"
+        "type": "text",
+        "analyzer": "simple"
       },
       "errorReport": {
         "type": "text"

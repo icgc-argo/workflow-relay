@@ -42,7 +42,8 @@
         "type": "integer"
       },
       "script": {
-        "type": "text"
+        "type": "text",
+        "analyzer": "simple"
       },
       "workdir": {
         "type": "keyword"
