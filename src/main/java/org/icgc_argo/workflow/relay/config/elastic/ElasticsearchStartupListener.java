@@ -52,10 +52,10 @@ public class ElasticsearchStartupListener implements ApplicationListener<Context
   private final ElasticsearchProperties properties;
   private final List<String> activeProfiles;
 
-  @Value("classpath:run_log_mapping.json")
+  @Value("classpath:run_log_index_source.json")
   private Resource workflowIndexMapping;
 
-  @Value("classpath:task_log_mapping.json")
+  @Value("classpath:task_log_index_source.json")
   private Resource taskIndexMapping;
 
   @Value("classpath:workflow_graph_log_mapping.json")

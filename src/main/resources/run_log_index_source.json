@@ -1,4 +1,14 @@
 {
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "repository_analyzer": {
+          "type": "stop",
+          "stopwords": ["git", "www", "http", "https"]
+        }
+      }
+    }
+  },
   "mappings": {
     "dynamic": true,
     "dynamic_templates": [
@@ -51,7 +61,7 @@
       },
       "repository": {
         "type": "text",
-        "analyzer": "simple"
+        "analyzer": "repository_analyzer"
       },
       "exitStatus": {
         "type": "integer"
