@@ -37,8 +37,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Map;
+
 @Slf4j
-@RunWith(SpringRunner.class)
 public class TestDocumentConverter {
 
   private static final ObjectMapper MAPPER =
@@ -132,5 +133,25 @@ public class TestDocumentConverter {
     assertEquals(trace.getWriteBytes(), doc.getWriteBytes());
     assertEquals(trace.getDuration(), doc.getDuration());
     assertEquals(trace.getRealtime(), doc.getRealtime());
+  }
+
+  @Test
+  public void testParamsMerging() {
+    val oldParams = Map.of(
+            "scoreMem", 5,
+            "nestedParamOne", Map.of("valueOfThing", "asdf"),
+            "nested-param-two", Map.of("valueOfThing", "asdf")
+    );
+    val newParams = Map.of(
+            "scoreMem", 5,
+            "score-mem", 5,
+            "nestedParamOne", Map.of("valueOfThing", "asdf"),
+            "nested-param-one", Map.of("valueOfThing", "asdf"),
+            "nestedParamTwo", Map.of("valueOfThing", "asdf"),
+            "nested-param-two", Map.of("valueOfThing", "asdf")
+    );
+    
+    val result = NextflowDocumentConverter.mergeParams(oldParams, newParams);
+    assertEquals(oldParams, result);
   }
 }
