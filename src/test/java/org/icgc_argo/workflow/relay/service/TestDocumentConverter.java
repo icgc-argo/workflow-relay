@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.icgc_argo.workflow.relay.model.index.TaskState;
@@ -34,10 +35,6 @@ import org.icgc_argo.workflow.relay.model.nextflow.TaskEvent;
 import org.icgc_argo.workflow.relay.model.nextflow.WorkflowEvent;
 import org.icgc_argo.workflow.relay.util.NextflowDocumentConverter;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Map;
 
 @Slf4j
 public class TestDocumentConverter {
@@ -137,20 +134,20 @@ public class TestDocumentConverter {
 
   @Test
   public void testParamsMerging() {
-    val oldParams = Map.of(
+    val oldParams =
+        Map.of(
             "scoreMem", 5,
             "nestedParamOne", Map.of("valueOfThing", "asdf"),
-            "nested-param-two", Map.of("valueOfThing", "asdf")
-    );
-    val newParams = Map.of(
+            "nested-param-two", Map.of("valueOfThing", "asdf"));
+    val newParams =
+        Map.of(
             "scoreMem", 5,
             "score-mem", 5,
             "nestedParamOne", Map.of("valueOfThing", "asdf"),
             "nested-param-one", Map.of("valueOfThing", "asdf"),
             "nestedParamTwo", Map.of("valueOfThing", "asdf"),
-            "nested-param-two", Map.of("valueOfThing", "asdf")
-    );
-    
+            "nested-param-two", Map.of("valueOfThing", "asdf"));
+
     val result = NextflowDocumentConverter.mergeParams(oldParams, newParams);
     assertEquals(oldParams, result);
   }

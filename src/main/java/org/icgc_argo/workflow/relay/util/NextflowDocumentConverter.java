@@ -20,10 +20,11 @@ package org.icgc_argo.workflow.relay.util;
 
 import static org.icgc_argo.workflow.relay.exceptions.NotFoundException.checkNotFound;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -33,114 +34,123 @@ import org.icgc_argo.workflow.relay.model.index.*;
 import org.icgc_argo.workflow.relay.model.nextflow.TaskEvent;
 import org.icgc_argo.workflow.relay.model.nextflow.WorkflowEvent;
 
-/**
- * Utility class that converts metadata POJOs to index POJOs.
- */
+/** Utility class that converts metadata POJOs to index POJOs. */
 @Slf4j
 @NoArgsConstructor
 public class NextflowDocumentConverter {
 
-    public static WorkflowDocument buildWorkflowDocument(@NonNull WorkflowEvent workflowEvent) {
+  public static WorkflowDocument buildWorkflowDocument(@NonNull WorkflowEvent workflowEvent) {
+    return buildWorkflowDocument(workflowEvent, null);
+  }
 
-        checkNotFound(
-                workflowEvent.getMetadata() != null,
-                "Cannot convert workflow event to workflow document: metadata is null.");
-        checkNotFound(
-                workflowEvent.getMetadata().getWorkflow() != null,
-                "Cannot convert workflow event to workflow document: workflow is null.");
+  public static WorkflowDocument buildWorkflowDocument(
+      @NonNull WorkflowEvent workflowEvent, WorkflowDocument oldDocument) {
+    checkNotFound(
+        workflowEvent.getMetadata() != null,
+        "Cannot convert workflow event to workflow document: metadata is null.");
+    checkNotFound(
+        workflowEvent.getMetadata().getWorkflow() != null,
+        "Cannot convert workflow event to workflow document: workflow is null.");
 
-        val workflow = workflowEvent.getMetadata().getWorkflow();
+    val workflow = workflowEvent.getMetadata().getWorkflow();
 
-        val engineParams =
-                EngineParameters.builder()
-                        .revision(workflow.getRevision())
-                        .resume(workflow.getResume())
-                        .launchDir(workflow.getLaunchDir())
-                        .projectDir(workflow.getProjectDir())
-                        .workDir(workflow.getWorkDir())
-                        .build();
+    val engineParams =
+        EngineParameters.builder()
+            .revision(workflow.getRevision())
+            .resume(workflow.getResume())
+            .launchDir(workflow.getLaunchDir())
+            .projectDir(workflow.getProjectDir())
+            .workDir(workflow.getWorkDir())
+            .build();
 
-        val success = workflow.getSuccess();
+    val success = workflow.getSuccess();
 
-        val doc =
-                WorkflowDocument.builder()
-                        .runId(workflowEvent.getRunName())
-                        .sessionId(workflowEvent.getRunId())
-                        .state(WorkflowState.fromNextflowEventAndSuccess(workflowEvent.getEvent(), success))
-                        .parameters(workflowEvent.getMetadata().getParameters())
-                        .engineParameters(engineParams)
-                        .startTime(workflow.getStart().toInstant())
-                        .repository(workflow.getRepository())
-                        .commandLine(workflow.getCommandLine())
-                        .errorReport(workflow.getErrorReport())
-                        .exitStatus(workflow.getExitStatus())
-                        .success(success)
-                        .duration(workflow.getDuration());
+    val parameters =
+        oldDocument != null
+            ? mergeParams(oldDocument.getParameters(), workflowEvent.getMetadata().getParameters())
+            : workflowEvent.getMetadata().getParameters();
 
-        val completeTime = workflow.getComplete();
-        if (Objects.nonNull(completeTime)) {
-            doc.completeTime(completeTime.toInstant());
-        }
+    val doc =
+        WorkflowDocument.builder()
+            .runId(workflowEvent.getRunName())
+            .sessionId(workflowEvent.getRunId())
+            .state(WorkflowState.fromNextflowEventAndSuccess(workflowEvent.getEvent(), success))
+            .parameters(parameters)
+            .engineParameters(engineParams)
+            .startTime(workflow.getStart().toInstant())
+            .repository(workflow.getRepository())
+            .commandLine(workflow.getCommandLine())
+            .errorReport(workflow.getErrorReport())
+            .exitStatus(workflow.getExitStatus())
+            .success(success)
+            .duration(workflow.getDuration());
 
-        return doc.build();
+    val completeTime = workflow.getComplete();
+    if (Objects.nonNull(completeTime)) {
+      doc.completeTime(completeTime.toInstant());
     }
 
-    public static TaskDocument buildTaskDocument(@NonNull TaskEvent taskEvent) {
+    return doc.build();
+  }
 
-        checkNotFound(
-                taskEvent.getTrace() != null, "Cannot convert task event to task document, trace is null.");
-        val trace = taskEvent.getTrace();
+  public static TaskDocument buildTaskDocument(@NonNull TaskEvent taskEvent) {
 
-        return TaskDocument.builder()
-                .runId(taskEvent.getRunName())
-                .sessionId(taskEvent.getRunId())
-                .taskId(trace.getTaskId())
-                .name(trace.getName())
-                .process(trace.getProcess())
-                .tag(trace.getTag())
-                .container(trace.getContainer())
-                .attempt(trace.getAttempt())
-                .state(TaskState.fromValue(trace.getStatus()))
-                .submitTime(trace.getSubmit())
-                .startTime(trace.getStart())
-                .completeTime(trace.getComplete())
-                .exit(trace.getExit())
-                .script(trace.getScript())
-                .workdir(trace.getWorkdir())
-                .cpus(trace.getCpus())
-                .memory(trace.getMemory())
-                .duration(trace.getDuration())
-                .realtime(trace.getRealtime())
-                .rss(trace.getRss())
-                .peakRss(trace.getPeakRss())
-                .vmem(trace.getVmem())
-                .peakVmem(trace.getPeakVmem())
-                .readBytes(trace.getReadBytes())
-                .writeBytes(trace.getWriteBytes())
-                .build();
-    }
+    checkNotFound(
+        taskEvent.getTrace() != null, "Cannot convert task event to task document, trace is null.");
+    val trace = taskEvent.getTrace();
 
-    public static Map<String, Object> mergeParams(Map<String, Object> originalParams, Map<String, Object> newParams) {
-        val newKeysToIgnore = newParams.keySet()
-                .stream()
-                .filter(k -> k.contains("-"))
-                .flatMap(k -> {
-                    val camelCase = kebabToCamelCase(k);
-                    if (originalParams.keySet().contains(k)) {
-                        return Stream.of(camelCase);
-                    } else if (originalParams.keySet().contains(camelCase)) {
-                        return  Stream.of(k);
-                    }
-                    return Stream.empty();
+    return TaskDocument.builder()
+        .runId(taskEvent.getRunName())
+        .sessionId(taskEvent.getRunId())
+        .taskId(trace.getTaskId())
+        .name(trace.getName())
+        .process(trace.getProcess())
+        .tag(trace.getTag())
+        .container(trace.getContainer())
+        .attempt(trace.getAttempt())
+        .state(TaskState.fromValue(trace.getStatus()))
+        .submitTime(trace.getSubmit())
+        .startTime(trace.getStart())
+        .completeTime(trace.getComplete())
+        .exit(trace.getExit())
+        .script(trace.getScript())
+        .workdir(trace.getWorkdir())
+        .cpus(trace.getCpus())
+        .memory(trace.getMemory())
+        .duration(trace.getDuration())
+        .realtime(trace.getRealtime())
+        .rss(trace.getRss())
+        .peakRss(trace.getPeakRss())
+        .vmem(trace.getVmem())
+        .peakVmem(trace.getPeakVmem())
+        .readBytes(trace.getReadBytes())
+        .writeBytes(trace.getWriteBytes())
+        .build();
+  }
+
+  public static Map<String, Object> mergeParams(
+      Map<String, Object> originalParams, Map<String, Object> newParams) {
+    val newKeysToIgnore =
+        newParams.keySet().stream()
+            .filter(k -> k.contains("-"))
+            .flatMap(
+                k -> {
+                  val camelCase = kebabToCamelCase(k);
+                  if (originalParams.containsKey(k)) {
+                    return Stream.of(camelCase);
+                  } else if (originalParams.containsKey(camelCase)) {
+                    return Stream.of(k);
+                  }
+                  return Stream.empty();
                 })
-                .collect(Collectors.toUnmodifiableSet());
+            .collect(Collectors.toUnmodifiableSet());
 
-        val merged = new HashMap<>(newParams);
-        newKeysToIgnore.forEach(merged::remove);
-        return merged;
-    }
+    val merged = new HashMap<>(newParams);
+    newKeysToIgnore.forEach(merged::remove);
+    return merged;
+  }
 
-    private static String kebabToCamelCase(String s) {
-        return CaseUtils.toCamelCase(s, false, '-');
-    }
+  private static String kebabToCamelCase(String s) {
+    return CaseUtils.toCamelCase(s, false, '-');
+  }
 }
