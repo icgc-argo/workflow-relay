@@ -133,7 +133,7 @@ public class TestDocumentConverter {
   }
 
   @Test
-  public void testParamsMerging() {
+  public void testNextflowParamsMerging() {
     val oldParams =
         Map.of(
             "scoreMem", 5,
@@ -148,7 +148,7 @@ public class TestDocumentConverter {
             "nestedParamTwo", Map.of("valueOfThing", "asdf"),
             "nested-param-two", Map.of("valueOfThing", "asdf"));
 
-    val result = NextflowDocumentConverter.mergeParams(oldParams, newParams);
+    val result = NextflowDocumentConverter.mergeNextflowParams(oldParams, newParams);
     assertEquals(oldParams, result);
   }
 }

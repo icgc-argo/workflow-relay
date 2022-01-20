@@ -67,7 +67,7 @@ public class NextflowDocumentConverter {
 
     val parameters =
         oldDocument != null
-            ? mergeParams(oldDocument.getParameters(), workflowEvent.getMetadata().getParameters())
+            ? mergeNextflowParams(oldDocument.getParameters(), workflowEvent.getMetadata().getParameters())
             : workflowEvent.getMetadata().getParameters();
 
     val doc =
@@ -128,7 +128,21 @@ public class NextflowDocumentConverter {
         .build();
   }
 
-  public static Map<String, Object> mergeParams(
+
+  /**
+   * Nextflow duplicates camelCase params by adding a kebab-case param
+   * and vise versa. As of Nextflow verion 21.04.3, there is no way
+   * to disable this behavior. This function will merge params while
+   * finding any params that are being duplicated due to the case change
+   * and ignore them.
+   *
+   * More info: https://github.com/nextflow-io/nextflow/issues/2061
+   *
+   * @param originalParams The params existing in the current Document
+   * @param newParams The params trying to update the original
+   * @return Merged Params which contains any newParams but ignores duplicated params via case change
+   */
+  public static Map<String, Object> mergeNextflowParams(
       Map<String, Object> originalParams, Map<String, Object> newParams) {
     val newKeysToIgnore =
         newParams.keySet().stream()
