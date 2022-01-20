@@ -18,6 +18,10 @@
 
 package org.icgc_argo.workflow.relay.config.elastic;
 
+import static java.util.Arrays.asList;
+import static org.icgc_argo.workflow.relay.util.StringUtilities.inputStreamToString;
+
+import java.util.List;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -37,11 +41,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.icgc_argo.workflow.relay.util.StringUtilities.inputStreamToString;
 
 @Profile({"index", "graphlog"})
 @Slf4j

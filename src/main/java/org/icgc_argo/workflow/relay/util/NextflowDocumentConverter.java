@@ -20,11 +20,16 @@ package org.icgc_argo.workflow.relay.util;
 
 import static org.icgc_argo.workflow.relay.exceptions.NotFoundException.checkNotFound;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.text.CaseUtils;
 import org.icgc_argo.workflow.relay.model.index.*;
 import org.icgc_argo.workflow.relay.model.nextflow.TaskEvent;
 import org.icgc_argo.workflow.relay.model.nextflow.WorkflowEvent;
@@ -35,7 +40,11 @@ import org.icgc_argo.workflow.relay.model.nextflow.WorkflowEvent;
 public class NextflowDocumentConverter {
 
   public static WorkflowDocument buildWorkflowDocument(@NonNull WorkflowEvent workflowEvent) {
+    return buildWorkflowDocument(workflowEvent, null);
+  }
 
+  public static WorkflowDocument buildWorkflowDocument(
+      @NonNull WorkflowEvent workflowEvent, WorkflowDocument oldDocument) {
     checkNotFound(
         workflowEvent.getMetadata() != null,
         "Cannot convert workflow event to workflow document: metadata is null.");
@@ -56,12 +65,18 @@ public class NextflowDocumentConverter {
 
     val success = workflow.getSuccess();
 
+    val parameters =
+        oldDocument != null
+            ? mergeNextflowParams(
+                oldDocument.getParameters(), workflowEvent.getMetadata().getParameters())
+            : workflowEvent.getMetadata().getParameters();
+
     val doc =
         WorkflowDocument.builder()
             .runId(workflowEvent.getRunName())
             .sessionId(workflowEvent.getRunId())
             .state(WorkflowState.fromNextflowEventAndSuccess(workflowEvent.getEvent(), success))
-            .parameters(workflowEvent.getMetadata().getParameters())
+            .parameters(parameters)
             .engineParameters(engineParams)
             .startTime(workflow.getStart().toInstant())
             .repository(workflow.getRepository())
@@ -112,5 +127,48 @@ public class NextflowDocumentConverter {
         .readBytes(trace.getReadBytes())
         .writeBytes(trace.getWriteBytes())
         .build();
+  }
+
+  /**
+   * Nextflow duplicates camelCase params by adding a kebab-case param and vise versa. As of
+   * Nextflow verion 21.04.3, there is no way to disable this behavior. This function will merge
+   * params while finding any params that are being duplicated due to the case change and ignore
+   * them.
+   *
+   * <p>More info: https://github.com/nextflow-io/nextflow/issues/2061
+   *
+   * @param originalParams The params existing in the current Document
+   * @param newParams The params trying to update the original
+   * @return Merged Params which contains any newParams but ignores duplicated params via case
+   *     change
+   */
+  public static Map<String, Object> mergeNextflowParams(
+      Map<String, Object> originalParams, Map<String, Object> newParams) {
+    val newKeysToIgnore =
+        newParams.keySet().stream()
+            .filter(k -> k.contains("-"))
+            .flatMap(
+                k -> {
+                  val camelCase = kebabToCamelCase(k);
+                  if (originalParams.containsKey(k) && !originalParams.containsKey(camelCase)) {
+                    // original only has kebab-case so ignore duplicated camelCase
+                    return Stream.of(camelCase);
+                  } else if (originalParams.containsKey(camelCase)
+                      && !originalParams.containsKey(k)) {
+                    // original only has camelCase so ignore duplicated kebab-case
+                    return Stream.of(k);
+                  }
+
+                  return Stream.empty();
+                })
+            .collect(Collectors.toUnmodifiableSet());
+
+    val merged = new HashMap<>(newParams);
+    newKeysToIgnore.forEach(merged::remove);
+    return merged;
+  }
+
+  private static String kebabToCamelCase(String s) {
+    return CaseUtils.toCamelCase(s, false, '-');
   }
 }
