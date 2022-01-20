@@ -67,7 +67,8 @@ public class NextflowDocumentConverter {
 
     val parameters =
         oldDocument != null
-            ? mergeNextflowParams(oldDocument.getParameters(), workflowEvent.getMetadata().getParameters())
+            ? mergeNextflowParams(
+                oldDocument.getParameters(), workflowEvent.getMetadata().getParameters())
             : workflowEvent.getMetadata().getParameters();
 
     val doc =
@@ -128,19 +129,18 @@ public class NextflowDocumentConverter {
         .build();
   }
 
-
   /**
-   * Nextflow duplicates camelCase params by adding a kebab-case param
-   * and vise versa. As of Nextflow verion 21.04.3, there is no way
-   * to disable this behavior. This function will merge params while
-   * finding any params that are being duplicated due to the case change
-   * and ignore them.
+   * Nextflow duplicates camelCase params by adding a kebab-case param and vise versa. As of
+   * Nextflow verion 21.04.3, there is no way to disable this behavior. This function will merge
+   * params while finding any params that are being duplicated due to the case change and ignore
+   * them.
    *
-   * More info: https://github.com/nextflow-io/nextflow/issues/2061
+   * <p>More info: https://github.com/nextflow-io/nextflow/issues/2061
    *
    * @param originalParams The params existing in the current Document
    * @param newParams The params trying to update the original
-   * @return Merged Params which contains any newParams but ignores duplicated params via case change
+   * @return Merged Params which contains any newParams but ignores duplicated params via case
+   *     change
    */
   public static Map<String, Object> mergeNextflowParams(
       Map<String, Object> originalParams, Map<String, Object> newParams) {
@@ -150,11 +150,15 @@ public class NextflowDocumentConverter {
             .flatMap(
                 k -> {
                   val camelCase = kebabToCamelCase(k);
-                  if (originalParams.containsKey(k)) {
+                  if (originalParams.containsKey(k) && !originalParams.containsKey(camelCase)) {
+                    // original only has kebab-case so ignore duplicated camelCase
                     return Stream.of(camelCase);
-                  } else if (originalParams.containsKey(camelCase)) {
+                  } else if (originalParams.containsKey(camelCase)
+                      && !originalParams.containsKey(k)) {
+                    // original only has camelCase so ignore duplicated kebab-case
                     return Stream.of(k);
                   }
+
                   return Stream.empty();
                 })
             .collect(Collectors.toUnmodifiableSet());
