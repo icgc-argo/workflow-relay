@@ -89,3 +89,4 @@ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic workflow
 ### Elastic Search mapping notes
 - In ES 7.00+, these are all the available `match_mapping_type` for dynamic templates: `[object, string, long, double, boolean, date, binary]`
 - The `run_log` mapping has `match_mapping_type` dynamic templates which maps double, long, boolean, date and binary to keyword.
+- In `run_log` index, the `repository` field is using a customized `stop` analyzer which is basically a `simple` analyzer with configurable stop words (more info [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-stop-analyzer.html#analysis-stop-analyzer)). The array of `stopwords` will be ignored when matching queries for this field. 

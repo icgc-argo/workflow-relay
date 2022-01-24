@@ -24,8 +24,8 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum NextflowState {
-    FAILED("FAILED"),
-    ERROR("ERROR");
+  FAILED("FAILED"),
+  ERROR("ERROR");
 
-    @Getter @NonNull private final String value;
+  @Getter @NonNull private final String value;
 }

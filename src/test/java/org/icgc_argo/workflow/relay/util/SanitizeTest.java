@@ -18,7 +18,7 @@
 
 package org.icgc_argo.workflow.relay.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Files;

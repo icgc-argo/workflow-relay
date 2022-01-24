@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.icgc_argo.workflow.relay.model.index.TaskState;
@@ -34,11 +35,8 @@ import org.icgc_argo.workflow.relay.model.nextflow.TaskEvent;
 import org.icgc_argo.workflow.relay.model.nextflow.WorkflowEvent;
 import org.icgc_argo.workflow.relay.util.NextflowDocumentConverter;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
 
 @Slf4j
-@RunWith(SpringRunner.class)
 public class TestDocumentConverter {
 
   private static final ObjectMapper MAPPER =
@@ -132,5 +130,61 @@ public class TestDocumentConverter {
     assertEquals(trace.getWriteBytes(), doc.getWriteBytes());
     assertEquals(trace.getDuration(), doc.getDuration());
     assertEquals(trace.getRealtime(), doc.getRealtime());
+  }
+
+  @Test
+  public void testBasicNextflowParamsMerging() {
+    val oldParams =
+        Map.of(
+            "scoreMem", 5,
+            "nestedParamOne", Map.of("valueOfThing", "asdf"),
+            "nested-param-two", Map.of("valueOfThing", "asdf"));
+    val newParams =
+        Map.of(
+            "scoreMem", 5,
+            "score-mem", 5,
+            "nestedParamOne", Map.of("valueOfThing", "asdf"),
+            "nested-param-one", Map.of("valueOfThing", "asdf"),
+            "nestedParamTwo", Map.of("valueOfThing", "asdf"),
+            "nested-param-two", Map.of("valueOfThing", "asdf"));
+    val expectedParams =
+        Map.of(
+            "scoreMem", 5,
+            "nestedParamOne", Map.of("valueOfThing", "asdf"),
+            "nested-param-two", Map.of("valueOfThing", "asdf"));
+    val result = NextflowDocumentConverter.mergeNextflowParams(oldParams, newParams);
+    assertEquals(expectedParams, result);
+  }
+
+  @Test
+  public void testNextflowParamsMergingWithExistingDuplicates() {
+    // nextflow at run time will use the same value for nestedParamOne and nested-param-one
+    val oldParams =
+        Map.of(
+            "scoreMem", 5,
+            "nestedParamOne", Map.of("valueOfThing", "asdf"),
+            "nested-param-one", Map.of("qwerty", "qwert"));
+
+    // from oldParams, nextflow will convert to params as represented by newParams
+    val newParams =
+        Map.of(
+            "scoreMem",
+            5,
+            "score-mem",
+            5,
+            "nestedParamOne",
+            Map.of("valueOfThing", "asdf"),
+            "nested-param-one",
+            Map.of("valueOfThing", "asdf"));
+
+    // expecting nested-param-one from original to be updated by nextflow newParams
+    // note the expected number of top level keys is same as oldParam keys
+    val expectedParams =
+        Map.of(
+            "scoreMem", 5,
+            "nestedParamOne", Map.of("valueOfThing", "asdf"),
+            "nested-param-one", Map.of("valueOfThing", "asdf"));
+    val actualParams = NextflowDocumentConverter.mergeNextflowParams(oldParams, newParams);
+    assertEquals(expectedParams, actualParams);
   }
 }

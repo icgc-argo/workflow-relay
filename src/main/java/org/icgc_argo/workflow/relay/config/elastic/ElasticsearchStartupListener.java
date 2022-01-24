@@ -18,6 +18,10 @@
 
 package org.icgc_argo.workflow.relay.config.elastic;
 
+import static java.util.Arrays.asList;
+import static org.icgc_argo.workflow.relay.util.StringUtilities.inputStreamToString;
+
+import java.util.List;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -38,11 +42,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.icgc_argo.workflow.relay.util.StringUtilities.inputStreamToString;
-
 @Profile({"index", "graphlog"})
 @Slf4j
 @Component
@@ -52,10 +51,10 @@ public class ElasticsearchStartupListener implements ApplicationListener<Context
   private final ElasticsearchProperties properties;
   private final List<String> activeProfiles;
 
-  @Value("classpath:run_log_mapping.json")
+  @Value("classpath:run_log_index_source.json")
   private Resource workflowIndexMapping;
 
-  @Value("classpath:task_log_mapping.json")
+  @Value("classpath:task_log_index_source.json")
   private Resource taskIndexMapping;
 
   @Value("classpath:workflow_graph_log_mapping.json")
