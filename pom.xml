@@ -18,7 +18,7 @@
         <java.version>11</java.version>
         <spring-boot-admin.version>2.1.5</spring-boot-admin.version>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
-        <elasticsearch.version>7.4.0</elasticsearch.version>
+        <elasticsearch.version>7.14.0</elasticsearch.version>
     </properties>
 
     <dependencies>
