@@ -1,5 +1,9 @@
 {
   "settings": {
+    "index": {
+      "number_of_shards": $numberOfShards,
+      "number_of_replicas": $numberOfReplicas
+    },
     "analysis": {
       "analyzer": {
         "repository_analyzer": {
