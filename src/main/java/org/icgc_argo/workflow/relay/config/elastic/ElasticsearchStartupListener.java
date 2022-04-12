@@ -46,18 +46,19 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class ElasticsearchStartupListener implements ApplicationListener<ContextRefreshedEvent> {
-
+  private static final String NUM_OF_SHARDS_TEMPLATE = "$numberOfShards";
+  private static final String NUM_OF_REPLICAS_TEMPLATE = "$numberOfReplicas";
   private final RestHighLevelClient client;
   private final ElasticsearchProperties properties;
   private final List<String> activeProfiles;
 
-  @Value("classpath:run_log_index_source.json")
+  @Value("classpath:run_log_index_source_template")
   private Resource workflowIndexMapping;
 
-  @Value("classpath:task_log_index_source.json")
+  @Value("classpath:task_log_index_source_template")
   private Resource taskIndexMapping;
 
-  @Value("classpath:workflow_graph_log_mapping.json")
+  @Value("classpath:workflow_graph_log_source_template")
   private Resource graphLogIndexMapping;
 
   @Autowired
@@ -89,15 +90,12 @@ public class ElasticsearchStartupListener implements ApplicationListener<Context
   private void ensureIndex(String indexName, ContextRefreshedEvent event) {
     val request = new GetIndexRequest(indexName);
     if (!client.indices().exists(request, RequestOptions.DEFAULT)) {
-      val indexSource = loadIndexSourceAsString(indexName);
-      val createRequest =
-          new CreateIndexRequest(indexName)
-              .settings(
-                  Settings.builder()
-                      .put("index.number_of_shards", properties.numberOfShards)
-                      .put("index.number_of_replicas", properties.numberOfReplicas));
-      log.info("Creating index {}", indexName);
+      val indexSource = loadIndexSourceAsString(indexName)
+              .replace(NUM_OF_SHARDS_TEMPLATE, properties.numberOfShards.toString())
+              .replace(NUM_OF_REPLICAS_TEMPLATE, properties.numberOfReplicas.toString());
+      val createRequest =new CreateIndexRequest(indexName);
       createRequest.source(indexSource, XContentType.JSON);
+      log.info("Creating index {}", indexName);
       val response = client.indices().create(createRequest, RequestOptions.DEFAULT);
       if (!response.isAcknowledged()) {
         log.error("Could not ensure required indices when creating index: {}", indexName);
