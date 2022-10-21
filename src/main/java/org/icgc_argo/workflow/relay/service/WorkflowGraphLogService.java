@@ -42,11 +42,13 @@ public class WorkflowGraphLogService {
 
   @StreamListener(GraphLogStream.INFODEBUG)
   public void indexInfoDebug(JsonNode event) {
+    log.debug("WorkflowGraphLogService: INFODEBUG listener called");
     indexGraphLog(graphLogInfoDebugIndex, event);
   }
 
   @StreamListener(GraphLogStream.WARNINGERROR)
   public void indexWarningError(JsonNode event) {
+    log.debug("WorkflowGraphLogService: WARNINGERROR listener called");
     indexGraphLog(graphLogErrorWarningIndex, event);
   }
 
