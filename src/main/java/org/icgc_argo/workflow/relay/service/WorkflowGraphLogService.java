@@ -52,7 +52,7 @@ public class WorkflowGraphLogService {
 
   @SneakyThrows
   private void indexGraphLog(String index, JsonNode event) {
-    log.info("Indexing GraphLog event into {}: {}", index, event.toString());
+    log.debug("Indexing GraphLog event into {}: {}", index, event.toString());
     val source = MAPPER.writeValueAsBytes(event);
     val request = new IndexRequest(index);
     request.id(DigestUtils.sha1Hex(source));
