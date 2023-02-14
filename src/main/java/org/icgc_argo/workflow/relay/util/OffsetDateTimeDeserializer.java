@@ -47,10 +47,10 @@ public class OffsetDateTimeDeserializer extends StdDeserializer<OffsetDateTime> 
       throws IOException, JsonProcessingException {
     JsonNode node = jp.getCodec().readTree(jp);
     val offset = node.get("offset");
+
     if(Objects.nonNull(offset)) {
       val offsetId = offset.get("id").textValue();
       val zoneOffSet = ZoneOffset.of(offsetId);
-
       return OffsetDateTime.of(
           node.get("year").asInt(),
           node.get("monthValue").asInt(),
