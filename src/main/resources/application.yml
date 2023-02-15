@@ -124,3 +124,9 @@ sanitize:
   paths:
     - "metadata.parameters.api_token"
     - "metadata.parameters.example_secret"
+
+logging:
+  level:
+    org:
+      icgc:
+        argo: DEBUG

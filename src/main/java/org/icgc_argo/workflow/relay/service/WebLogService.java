@@ -49,6 +49,7 @@ public class WebLogService {
     for (String path : sanitizeProperties.getPaths()) {
       Sanitize.sanitize(path, event);
     }
+    log.debug("WEBLOG output sent");
     return webLogStream.webLogOutput().send(MessageBuilder.withPayload(event).build());
   }
 }
