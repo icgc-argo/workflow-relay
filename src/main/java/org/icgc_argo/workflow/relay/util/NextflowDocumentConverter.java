@@ -19,6 +19,7 @@
 package org.icgc_argo.workflow.relay.util;
 
 import static org.icgc_argo.workflow.relay.exceptions.NotFoundException.checkNotFound;
+import static org.icgc_argo.workflow.relay.util.ObjectUtilities.defaultIfNullOrEmpty;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -56,23 +57,14 @@ public class NextflowDocumentConverter {
 
     val workflow = workflowEvent.getMetadata().getWorkflow();
 
+    EngineParameters oldEngineParamns = oldDocument.getEngineParameters();
     val engineParams =
         EngineParameters.builder()
-            .revision(ObjectUtils.isNotEmpty(workflow.getRevision())
-                ? workflow.getRevision()
-                : oldDocument.getEngineParameters().getRevision())
-            .resume(ObjectUtils.isNotEmpty(workflow.getResume())
-                ? workflow.getResume()
-                : oldDocument.getEngineParameters().getResume())
-            .launchDir(ObjectUtils.isNotEmpty(workflow.getLaunchDir())
-                ? workflow.getLaunchDir()
-                : oldDocument.getEngineParameters().getLaunchDir())
-            .projectDir(ObjectUtils.isNotEmpty(workflow.getProjectDir())
-                ? workflow.getProjectDir()
-                : oldDocument.getEngineParameters().getProjectDir())
-            .workDir(ObjectUtils.isNotEmpty(workflow.getWorkDir())
-                ? workflow.getWorkDir()
-                : oldDocument.getEngineParameters().getWorkDir())
+            .revision(defaultIfNullOrEmpty(workflow.getRevision(), oldEngineParamns.getRevision()))
+            .resume(defaultIfNullOrEmpty(workflow.getResume(),oldEngineParamns.getResume()))
+            .launchDir(defaultIfNullOrEmpty(workflow.getLaunchDir(), oldEngineParamns.getLaunchDir()))
+            .projectDir(defaultIfNullOrEmpty(workflow.getProjectDir(),oldEngineParamns.getProjectDir()))
+            .workDir(defaultIfNullOrEmpty(workflow.getWorkDir(), oldEngineParamns.getWorkDir()))
             .build();
 
     val success = workflow.getSuccess();
