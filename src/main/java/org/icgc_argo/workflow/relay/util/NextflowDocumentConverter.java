@@ -20,6 +20,7 @@ package org.icgc_argo.workflow.relay.util;
 
 import static org.icgc_argo.workflow.relay.exceptions.NotFoundException.checkNotFound;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +30,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.text.CaseUtils;
 import org.icgc_argo.workflow.relay.model.index.*;
 import org.icgc_argo.workflow.relay.model.nextflow.TaskEvent;
@@ -56,19 +58,30 @@ public class NextflowDocumentConverter {
 
     val engineParams =
         EngineParameters.builder()
-            .revision(workflow.getRevision())
-            .resume(workflow.getResume())
-            .launchDir(workflow.getLaunchDir())
-            .projectDir(workflow.getProjectDir())
-            .workDir(workflow.getWorkDir())
+            .revision(ObjectUtils.isNotEmpty(workflow.getRevision())
+                ? workflow.getRevision()
+                : oldDocument.getEngineParameters().getRevision())
+            .resume(ObjectUtils.isNotEmpty(workflow.getResume())
+                ? workflow.getResume()
+                : oldDocument.getEngineParameters().getResume())
+            .launchDir(ObjectUtils.isNotEmpty(workflow.getLaunchDir())
+                ? workflow.getLaunchDir()
+                : oldDocument.getEngineParameters().getLaunchDir())
+            .projectDir(ObjectUtils.isNotEmpty(workflow.getProjectDir())
+                ? workflow.getProjectDir()
+                : oldDocument.getEngineParameters().getProjectDir())
+            .workDir(ObjectUtils.isNotEmpty(workflow.getWorkDir())
+                ? workflow.getWorkDir()
+                : oldDocument.getEngineParameters().getWorkDir())
             .build();
 
     val success = workflow.getSuccess();
 
     val parameters =
-        oldDocument != null
-            ? mergeNextflowParams(
-                oldDocument.getParameters(), workflowEvent.getMetadata().getParameters())
+        oldDocument != null && ObjectUtils.isNotEmpty(workflowEvent.getMetadata().getParameters())
+            ? mergeNextflowParams(oldDocument.getParameters(), workflowEvent.getMetadata().getParameters())
+            : oldDocument != null && ObjectUtils.isEmpty(workflowEvent.getMetadata().getParameters())
+            ? oldDocument.getParameters()
             : workflowEvent.getMetadata().getParameters();
 
     val doc =
@@ -89,6 +102,8 @@ public class NextflowDocumentConverter {
     val completeTime = workflow.getComplete();
     if (Objects.nonNull(completeTime)) {
       doc.completeTime(completeTime.toInstant());
+      doc.duration(
+          Duration.between(workflow.getStart().toInstant(), completeTime).toMillis());
     }
 
     return doc.build();
