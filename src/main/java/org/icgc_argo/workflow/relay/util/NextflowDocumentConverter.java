@@ -57,14 +57,14 @@ public class NextflowDocumentConverter {
 
     val workflow = workflowEvent.getMetadata().getWorkflow();
 
-    EngineParameters oldEngineParamns = oldDocument.getEngineParameters();
+    EngineParameters oldEngineParams = ObjectUtils.isNotEmpty(oldDocument)?oldDocument.getEngineParameters():new EngineParameters();
     val engineParams =
         EngineParameters.builder()
-            .revision(defaultIfNullOrEmpty(workflow.getRevision(), oldEngineParamns.getRevision()))
-            .resume(defaultIfNullOrEmpty(workflow.getResume(),oldEngineParamns.getResume()))
-            .launchDir(defaultIfNullOrEmpty(workflow.getLaunchDir(), oldEngineParamns.getLaunchDir()))
-            .projectDir(defaultIfNullOrEmpty(workflow.getProjectDir(),oldEngineParamns.getProjectDir()))
-            .workDir(defaultIfNullOrEmpty(workflow.getWorkDir(), oldEngineParamns.getWorkDir()))
+            .revision(defaultIfNullOrEmpty(workflow.getRevision(), oldEngineParams.getRevision()))
+            .resume(defaultIfNullOrEmpty(workflow.getResume(),oldEngineParams.getResume()))
+            .launchDir(defaultIfNullOrEmpty(workflow.getLaunchDir(), oldEngineParams.getLaunchDir()))
+            .projectDir(defaultIfNullOrEmpty(workflow.getProjectDir(),oldEngineParams.getProjectDir()))
+            .workDir(defaultIfNullOrEmpty(workflow.getWorkDir(), oldEngineParams.getWorkDir()))
             .build();
 
     val success = workflow.getSuccess();
