@@ -85,7 +85,7 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.WORKFLOW)
   public void indexWorkflow(JsonNode event) {
-    log.debug("IndexService: WORKFLOW listener called ");
+    log.debug("workflow event: {}", event);
     // Convert nextflow workflow event to workflow index doc
     val workflowEvent = MAPPER.treeToValue(event, WorkflowEvent.class);
     val oldDocOpt = getWorkflowDocument(workflowEvent.getRunName());
@@ -101,7 +101,7 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.TASK)
   public void indexTask(JsonNode event) {
-    log.debug("IndexService: TASK listener called ");
+    log.debug("task event: {}", event);
     // Convert nextflow task event to task index doc
     val taskEvent = MAPPER.treeToValue(event, TaskEvent.class);
     val doc = NextflowDocumentConverter.buildTaskDocument(taskEvent);
@@ -111,7 +111,7 @@ public class IndexService {
     val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
 
     // Log and index
-    log.info("Indexing task {} for run: {}", doc.getTaskId(), doc.getRunId());
+    log.debug("Indexing task {} for run: {}", doc.getTaskId(), doc.getRunId());
     val request = new IndexRequest(taskIndex);
     request.id(docId);
     request.source(MAPPER.writeValueAsBytes(jsonNode), XContentType.JSON);
@@ -132,12 +132,12 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.WF_MGMT_WORKFLOW)
   public void indexWfMgmtWorkflowEvent(JsonNode event) {
-    log.debug("IndexService: WF_MGMT_WORKFLOW listener called ");
+    log.debug("workflow mgmt event: {}", event);
     val mgmtEvent = MAPPER.convertValue(event, WfManagementEvent.class);
 
     val runid = mgmtEvent.getRunId();
 
-    log.info("Indexing wf-mgmt event with runId: {}", runid);
+    log.debug("Indexing wf-mgmt event with runId: {}", runid);
 
     val workflowDocOpt = getWorkflowDocument(runid);
     WorkflowDocument workflowDoc;
@@ -147,7 +147,7 @@ public class IndexService {
       workflowDoc = workflowDocOpt.get();
       workflowDoc.setState(mgmtEvent.getEvent());
     } else {
-      log.info("No document exists with runId: {}", runid);
+      log.debug("No document exists with runId: {}", runid);
       workflowDoc =
           WorkflowDocument.builder()
               .runId(runid)
@@ -179,7 +179,7 @@ public class IndexService {
     val jsonNode = MAPPER.convertValue(doc, JsonNode.class);
 
     // Log and index
-    log.info(
+    log.debug(
         format(
             "Indexing workflow information for run with runId: { %s }, sessionId: { %s }",
             doc.getRunId(), doc.getSessionId()));
