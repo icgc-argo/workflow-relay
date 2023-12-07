@@ -48,6 +48,10 @@ public class NextflowDocumentConverter {
 
   public static WorkflowDocument buildWorkflowDocument(
       @NonNull WorkflowEvent workflowEvent, WorkflowDocument oldDocument) {
+
+    log.info("workflowEvent: {}", workflowEvent);
+    log.info("oldDocument: {}", oldDocument);
+
     checkNotFound(
         workflowEvent.getMetadata() != null,
         "Cannot convert workflow event to workflow document: metadata is null.");

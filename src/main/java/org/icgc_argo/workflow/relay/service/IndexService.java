@@ -85,7 +85,7 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.WORKFLOW)
   public void indexWorkflow(JsonNode event) {
-    log.debug("IndexService: WORKFLOW listener called ");
+    log.info("workflow event: {}", event);
     // Convert nextflow workflow event to workflow index doc
     val workflowEvent = MAPPER.treeToValue(event, WorkflowEvent.class);
     val oldDocOpt = getWorkflowDocument(workflowEvent.getRunName());
@@ -101,7 +101,7 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.TASK)
   public void indexTask(JsonNode event) {
-    log.debug("IndexService: TASK listener called ");
+    log.info("task event: {}", event);
     // Convert nextflow task event to task index doc
     val taskEvent = MAPPER.treeToValue(event, TaskEvent.class);
     val doc = NextflowDocumentConverter.buildTaskDocument(taskEvent);
@@ -132,7 +132,7 @@ public class IndexService {
   @SneakyThrows
   @StreamListener(IndexStream.WF_MGMT_WORKFLOW)
   public void indexWfMgmtWorkflowEvent(JsonNode event) {
-    log.debug("IndexService: WF_MGMT_WORKFLOW listener called ");
+    log.info("workflow mgmt event: {}", event);
     val mgmtEvent = MAPPER.convertValue(event, WfManagementEvent.class);
 
     val runid = mgmtEvent.getRunId();
