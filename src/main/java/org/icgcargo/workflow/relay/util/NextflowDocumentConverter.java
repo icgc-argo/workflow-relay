@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.text.CaseUtils;
-import org.icgc_argo.workflow.relay.model.index.*;
+import org.icgcargo.workflow.relay.model.index.*;
 import org.icgcargo.workflow.relay.model.nextflow.TaskEvent;
 import org.icgcargo.workflow.relay.model.nextflow.WorkflowEvent;
 import org.icgcargo.workflow.relay.exceptions.NotFoundException;
