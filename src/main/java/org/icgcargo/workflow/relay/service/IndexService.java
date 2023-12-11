@@ -82,9 +82,9 @@ public class IndexService {
     this.taskIndex = elasticsearchProperties.getTaskIndex();
   }
 
-  @SneakyThrows
+  //@SneakyThrows
   @StreamListener(IndexStream.WORKFLOW)
-  public void indexWorkflow(JsonNode event) {
+  public void indexWorkflow(JsonNode event) throws Exception{
     log.debug("workflow event: {}", event);
     // Convert nextflow workflow event to workflow index doc
     val workflowEvent = MAPPER.treeToValue(event, WorkflowEvent.class);
@@ -184,6 +184,8 @@ public class IndexService {
             "Indexing workflow information for run with runId: { %s }, sessionId: { %s }",
             doc.getRunId(), doc.getSessionId()));
 
+    log.debug("Indexing workflow: {}, {}, {}", doc.getRunId(), doc.getState(),doc.getState().ordinal());
+
     // Log and index
     val request = new IndexRequest(workflowIndex);
     request.id(doc.getRunId());
@@ -191,13 +193,15 @@ public class IndexService {
     request.versionType(VersionType.EXTERNAL);
     request.version(doc.getState().ordinal());
     try {
-      val indexResponse = esClient.index(request, RequestOptions.DEFAULT);
-      log.debug(indexResponse.toString());
+      //val indexResponse = esClient.index(request, RequestOptions.DEFAULT);
+      log.debug(esClient.index(request, RequestOptions.DEFAULT).toString());
+      //log.debug(indexResponse.toString());
     } catch (ElasticsearchStatusException e) {
       log.error(
-          "Out of order, already have newer version for run {}, exception: {}",
+          "Out of order, already have newer version for run {}, exception: {}, version: {}",
           doc.getRunId(),
-          e.getLocalizedMessage());
+          e.getLocalizedMessage(),
+          doc.getState().ordinal());
     }
   }
 
