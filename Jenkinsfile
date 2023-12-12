@@ -65,10 +65,7 @@ spec:
                 }
                 stage('Build & Publish Develop') {
                     when {
-                         anyOf {
-                                  branch "develop"
-                                  branch "package_rename"
-                                }
+                       branch "develop"
                     }
                     steps {
                         container('docker') {
