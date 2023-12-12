@@ -82,7 +82,6 @@ public class IndexService {
     this.taskIndex = elasticsearchProperties.getTaskIndex();
   }
 
-
   @StreamListener(IndexStream.WORKFLOW)
   public void indexWorkflow(JsonNode event) throws Exception{
     log.debug("workflow event: {}", event);
