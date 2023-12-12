@@ -65,7 +65,7 @@ spec:
                 }
                 stage('Build & Publish Develop') {
                     when {
-                        branch "develop"
+                       branch "develop"
                     }
                     steps {
                         container('docker') {
